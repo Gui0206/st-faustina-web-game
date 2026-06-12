@@ -61,7 +61,19 @@ SCENES.ch7 = {
     yield S.waitFor(() => sc.visitor && sc.visitor.state === 'waiting');
     yield S.textAuto('a young man — barefoot, bareheaded, his clothes frozen to him', 4);
     yield S.textAuto('“Something hot, if you can.”', 3.4);
-    yield S.text('There was no bread left to weigh, no choice to make. She went to the kitchen and brought him soup, full of crumbs.');
+    /* the basket may still hold loaves if the player chose word or prayer —
+       the beat must match what the player can see */
+    if (sc.bread > 0) {
+      S.do(() => {
+        const v = sc.visitor;
+        sc.loafAnim = { t: 0, from: { x: 240, y: 700 }, to: { x: v.x, y: v.y - v.def.h * 0.5 } };
+        Audio.swish(0.18);
+        Engine.after(900, () => { sc.bread = 0; Audio.pluck('G4', 0.3); });
+      });
+      yield S.text('There was bread in the basket still. She gave him all of it — and went to the kitchen besides, and brought him soup, full of crumbs.');
+    } else {
+      yield S.text('There was no bread left to weigh, no choice to make. She went to the kitchen and brought him soup, full of crumbs.');
+    }
     S.do(() => { Tweens.to(sc, { soup: 1 }, 2, { ease: Ease.inOutSine }); Audio.shimmer(0.2, 700); });
     yield S.wait(3);
     yield S.text('He ate. And as she took back the bowl, the rain forgot to fall.');
@@ -95,7 +107,7 @@ SCENES.ch7 = {
     const v = this.visitor;
     v.state = 'choosing';
     Choices.show([
-      { id: 'deed', label: 'Deed', sub: this.bread > 0 ? `give bread — ${this.bread} left` : 'no bread left', disabled: this.bread <= 0 },
+      { id: 'deed', label: 'Deed', sub: this.bread > 0 ? tr('give bread — {n} left').replace('{n}', this.bread) : 'no bread left', disabled: this.bread <= 0 },
       { id: 'word', label: 'Word', sub: 'stay, and speak' },
       { id: 'prayer', label: 'Prayer', sub: 'hold a moment' },
     ], id => this._choose(id));

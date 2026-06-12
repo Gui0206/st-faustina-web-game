@@ -144,7 +144,7 @@ const Engine = {
       };
 
       if (ch && !opts.noCard) {
-        TitleCard.show(ch.num ? `Chapter ${ch.num}` : '', ch.title, ch.place);
+        TitleCard.show(ch.num ? `${tr('Chapter')} ${ch.num}` : '', ch.title, ch.place);
         this.fade.color = '#000000';
         this.fade.alpha = 1;
         const start = this.time;

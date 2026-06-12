@@ -70,7 +70,7 @@ const Audio = {
   toggleMute() {
     this.muted = !this.muted;
     if (this.master) this.master.gain.setTargetAtTime(this.muted ? 0 : this.volume * 0.5, AC.currentTime, 0.05);
-    UI.flashNote(this.muted ? 'sound off — M' : 'sound on');
+    UI.flashNote(tr(this.muted ? 'sound off — M' : 'sound on'));
   },
 
   update(dt) {

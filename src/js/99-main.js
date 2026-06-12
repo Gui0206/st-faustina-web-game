@@ -1,6 +1,7 @@
 /* Boot. */
 
 Save.read();
+I18N.detect();
 UI.init();
 R.initGrain();
 Engine.init();

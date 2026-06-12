@@ -60,6 +60,15 @@ body{font-family:var(--serif);color:var(--ink);-webkit-font-smoothing:antialiase
 }
 .line.small{font-size:clamp(14px,1vw + 9px,20px);color:var(--ink-dim)}
 
+/* language chips */
+#m-lang .lang{
+  display:inline-block;margin-right:14px;padding:2px 8px;cursor:pointer;
+  color:var(--ink-dim);letter-spacing:.14em;font-size:13px;
+  border:1px solid transparent;border-radius:3px;transition:color .3s ease,border-color .3s ease;
+}
+#m-lang .lang:hover{color:var(--ink)}
+#m-lang .lang.on{color:#e8c98a;border-color:rgba(232,201,138,.35)}
+
 /* advance affordance */
 #advance{
   position:absolute;left:50%;bottom:max(4.2vh, env(safe-area-inset-bottom,0px) + 4.2vh);transform:translateX(-50%);
@@ -511,7 +520,7 @@ const Audio = {
   toggleMute() {
     this.muted = !this.muted;
     if (this.master) this.master.gain.setTargetAtTime(this.muted ? 0 : this.volume * 0.5, AC.currentTime, 0.05);
-    UI.flashNote(this.muted ? 'sound off — M' : 'sound on');
+    UI.flashNote(tr(this.muted ? 'sound off — M' : 'sound on'));
   },
 
   update(dt) {
@@ -1613,9 +1622,10 @@ const Text = {
            small, hold (min seconds before advance allowed) */
   show(str, opts = {}) {
     this.clear(true);
+    str = tr(str);
     const div = document.createElement('div');
     div.className = 'line' + (opts.voice ? ' voice' : opts.quote ? ' quote' : '') + (opts.small ? ' small' : '');
-    div.innerHTML = esc(str) + (opts.attr ? `<span class="attr">— ${esc(opts.attr)}</span>` : '');
+    div.innerHTML = esc(str) + (opts.attr ? `<span class="attr">— ${esc(tr(opts.attr))}</span>` : '');
     UI.els.textbox.appendChild(div);
     requestAnimationFrame(() => requestAnimationFrame(() => div.classList.add('on')));
     this.el = div;
@@ -1689,7 +1699,7 @@ const Hint = {
   timer: null,
   show(str, opts = {}) {
     const el = UI.els.hint;
-    el.textContent = str;
+    el.textContent = tr(str);
     el.style.top = opts.top || '62%';
     el.classList.add('on');
     clearTimeout(this.timer);
@@ -1705,9 +1715,9 @@ const TitleCard = {
     const el = UI.els.titlecard;
     el.innerHTML =
       (num ? `<div class="tc-num">${esc(num)}</div>` : '') +
-      `<div class="tc-title">${esc(title)}</div>` +
+      `<div class="tc-title">${esc(tr(title))}</div>` +
       `<div class="tc-rule"></div>` +
-      (place ? `<div class="tc-place">${esc(place)}</div>` : '');
+      (place ? `<div class="tc-place">${esc(tr(place))}</div>` : '');
     el.classList.add('on');
     this.visible = true;
     this.shownAt = Engine.time;
@@ -1728,7 +1738,7 @@ const Choices = {
     for (const o of options) {
       const b = document.createElement('button');
       b.className = 'choice' + (o.disabled ? ' disabled' : '');
-      b.innerHTML = esc(o.label) + (o.sub ? `<small>${esc(o.sub)}</small>` : '');
+      b.innerHTML = esc(tr(o.label)) + (o.sub ? `<small>${esc(tr(o.sub))}</small>` : '');
       b.addEventListener('pointerdown', e => e.stopPropagation());
       b.addEventListener('click', e => {
         e.stopPropagation();
@@ -1753,21 +1763,40 @@ const Menu = {
   open: false,
   build() {
     const el = UI.els.menu;
+    const langRow = I18N.LANGS.map(l =>
+      `<span class="lang${I18N.lang === l ? ' on' : ''}" data-lang="${l}">${l.toUpperCase()}</span>`).join('');
     el.innerHTML = `
       <div class="menu-panel">
         <div class="menu-title">Faustyna</div>
         <div class="menu-sep"></div>
-        <button class="menu-item" data-act="resume">Return</button>
-        <button class="menu-item" data-act="restart">Restart chapter</button>
+        <button class="menu-item" data-act="resume">${esc(tr('Return'))}</button>
+        <button class="menu-item" data-act="restart">${esc(tr('Restart chapter'))}</button>
         <div class="menu-sep"></div>
         <div id="menu-chapters"></div>
         <div class="menu-sep"></div>
-        <div class="menu-row">sound <input type="range" id="m-vol" min="0" max="100" step="1"></div>
-        <div class="menu-row"><span class="toggle" id="m-motion"><span class="box"></span> calm motion</span></div>
-        <div class="menu-note">A story drawn from the Diary of Saint Faustina Kowalska (1905–1938).
-        Quotations cited as “Diary, n.” are from <i>Diary: Divine Mercy in My Soul</i>,
-        © 1987 Congregation of Marians of the Immaculate Conception.</div>
+        <div class="menu-row">${esc(tr('sound'))} <input type="range" id="m-vol" min="0" max="100" step="1"></div>
+        <div class="menu-row"><span class="toggle" id="m-motion"><span class="box"></span> ${esc(tr('calm motion'))}</span></div>
+        <div class="menu-row" id="m-lang">${langRow}</div>
+        <div class="menu-note">${tr('A story drawn from the Diary of Saint Faustina Kowalska (1905–1938). Quotations cited as “Diary, n.” are from <i>Diary: Divine Mercy in My Soul</i>, © 1987 Congregation of Marians of the Immaculate Conception.')}</div>
       </div>`;
+    el.querySelector('#m-vol').addEventListener('input', e => {
+      Audio.init(); Audio.setVolume(e.target.value / 100);
+    });
+    el.querySelector('#m-motion').addEventListener('click', e => {
+      e.stopPropagation();
+      Save.data.settings.reduceMotion = !Save.data.settings.reduceMotion;
+      Save.write(); this.syncSettings();
+    });
+    el.querySelector('#m-lang').addEventListener('click', e => {
+      const chip = e.target.closest && e.target.closest('[data-lang]');
+      if (!chip) return;
+      e.stopPropagation();
+      I18N.set(chip.dataset.lang);
+      this.build(); this.refreshChapters(); this.syncSettings();   // re-render in the new language
+      Audio.pluck('A4', 0.2);
+    });
+    if (this._bound) return;
+    this._bound = true;
     el.addEventListener('pointerdown', e => e.stopPropagation());
     el.addEventListener('click', e => {
       const act = e.target.closest && e.target.closest('[data-act]');
@@ -1777,14 +1806,6 @@ const Menu = {
       if (a === 'resume') this.toggle(false);
       if (a === 'restart') { this.toggle(false); Engine.go(Engine.scene.id, { instant: false }); }
       if (a === 'chapter') { this.toggle(false); Engine.go(act.dataset.id, { instant: false }); }
-    });
-    el.querySelector('#m-vol').addEventListener('input', e => {
-      Audio.init(); Audio.setVolume(e.target.value / 100);
-    });
-    el.querySelector('#m-motion').addEventListener('click', e => {
-      e.stopPropagation();
-      Save.data.settings.reduceMotion = !Save.data.settings.reduceMotion;
-      Save.write(); this.syncSettings();
     });
   },
   syncSettings() {
@@ -1799,7 +1820,7 @@ const Menu = {
       const b = document.createElement('button');
       b.className = 'menu-item' + (locked ? ' locked' : '');
       b.dataset.act = 'chapter'; b.dataset.id = c.id;
-      b.innerHTML = `${c.num}. ${esc(c.menuTitle || c.title)}` + (locked ? '' : `<span class="menu-sub">${esc(c.place)}</span>`);
+      b.innerHTML = `${c.num}. ${esc(tr(c.menuTitle || c.title))}` + (locked ? '' : `<span class="menu-sub">${esc(tr(c.place))}</span>`);
       holder.appendChild(b);
     });
   },
@@ -1817,6 +1838,1008 @@ const Menu = {
 function esc(s) {
   return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
+
+
+/* ============ 05a-i18n.js ============ */
+/* i18n: the English strings ARE the keys; dictionaries map them to pt / it / pl.
+   Untranslated (or deliberately Polish) strings fall through unchanged.
+   Diary citations ("Diary, n") are rewritten by pattern. */
+
+const I18N = {
+  lang: 'en',
+  LANGS: ['en', 'pt', 'it', 'pl'],
+
+  detect() {
+    const saved = Save.data.settings.lang;
+    if (saved && this.LANGS.includes(saved)) { this.lang = saved; return; }
+    const nav = (navigator.language || 'en').toLowerCase();
+    this.lang = nav.startsWith('pt') ? 'pt' : nav.startsWith('it') ? 'it' : nav.startsWith('pl') ? 'pl' : 'en';
+  },
+
+  set(lang) {
+    if (!this.LANGS.includes(lang)) return;
+    this.lang = lang;
+    Save.data.settings.lang = lang;
+    Save.write();
+  },
+
+  attr: { pt: 'Diário, $1', it: 'Diario, $1', pl: 'Dzienniczek, $1' },
+
+  dict: { pt: {}, it: {}, pl: {} },
+};
+
+function tr(s) {
+  if (s == null || I18N.lang === 'en') return s;
+  const d = I18N.dict[I18N.lang];
+  if (d[s] !== undefined) return d[s];
+  const m = /^Diary, (\d+)$/.exec(s);
+  if (m) return I18N.attr[I18N.lang].replace('$1', m[1]);
+  return s;
+}
+
+
+/* ============ 05b-lang-pt.js ============ */
+/* Português (Brasil). As chaves são as frases originais em inglês. */
+
+I18N.dict.pt = {
+  /* ---- title ---- */
+  'VESSEL OF MERCY': 'VASO DE MISERICÓRDIA',
+  'FROM THE DIARY OF SAINT FAUSTINA KOWALSKA': 'DO DIÁRIO DE SANTA FAUSTINA KOWALSKA',
+  'it is the Hour of Mercy now': 'agora é a Hora da Misericórdia',
+  'touch anywhere': 'toque em qualquer lugar',
+  'Continue': 'Continuar',
+  'Begin again': 'Recomeçar',
+  'from Głogowiec': 'desde Głogowiec',
+  'The keepsake': 'A lembrança',
+  'return to your painting': 'volte à sua pintura',
+  'Begin': 'Começar',
+  'a true story, gently told': 'uma história real, contada com ternura',
+  'chapter': 'capítulo',
+  'Chapter': 'Capítulo',
+
+  /* ---- menu ---- */
+  'Return': 'Voltar',
+  'Restart chapter': 'Reiniciar capítulo',
+  'sound': 'som',
+  'calm motion': 'movimento calmo',
+  'A story drawn from the Diary of Saint Faustina Kowalska (1905–1938). Quotations cited as “Diary, n.” are from <i>Diary: Divine Mercy in My Soul</i>, © 1987 Congregation of Marians of the Immaculate Conception.':
+    'Uma história extraída do Diário de Santa Faustina Kowalska (1905–1938). As citações indicadas como “Diário, n.” provêm de <i>Diário: A Misericórdia Divina em Minha Alma</i>, © 1987 Congregação dos Padres Marianos da Imaculada Conceição.',
+  'sound off — M': 'som desligado — M',
+  'sound on': 'som ligado',
+
+  /* ---- chapter registry ---- */
+  'A Voice in the Night': 'Uma Voz na Noite',
+  'The Dance': 'O Baile',
+  'The Doors': 'As Portas',
+  'Small Things': 'Pequenas Coisas',
+  'Paint an Image': 'Pinta uma Imagem',
+  'The Chaplet': 'O Terço da Misericórdia',
+  'The Gate': 'O Portão',
+  'The Dark Night': 'A Noite Escura',
+  'The Spark': 'A Centelha',
+  'The Spark (epilogue)': 'A Centelha (epílogo)',
+  'Warsaw · 1925': 'Varsóvia · 1925',
+  'The Convent · 1926–1930': 'O Convento · 1926–1930',
+  'Płock · 22 February 1931': 'Płock · 22 de fevereiro de 1931',
+  'Vilnius · September 1935': 'Vilnius · setembro de 1935',
+  'Kraków · 1937': 'Cracóvia · 1937',
+  'Prądnik Sanatorium · 1938': 'Sanatório de Prądnik · 1938',
+  'Kraków-Łagiewniki · 5 October 1938': 'Cracóvia-Łagiewniki · 5 de outubro de 1938',
+  '1938 — today': '1938 — hoje',
+
+  /* ---- ch1 ---- */
+  'Głogowiec, central Poland. A farmhouse with ten children and never quite enough bread.':
+    'Głogowiec, centro da Polônia. Uma casa de lavoura com dez filhos e pão que nunca era bastante.',
+  'The third child, Helena, woke in the night. Something was calling her by name.':
+    'A terceira filha, Helena, acordou na noite. Algo a chamava pelo nome.',
+  'hold — and stay awhile': 'segure — e permaneça um pouco',
+  'It was in the seventh year of my life that, for the first time, I heard God’s voice in my soul; that is, an invitation to a more perfect life.':
+    'Foi no sétimo ano da minha vida que, pela primeira vez, ouvi a voz de Deus na alma, isto é, o convite a uma vida mais perfeita.',
+  'She was seven. For years she would try to outgrow it, the way one outgrows a dress.':
+    'Ela tinha sete anos. Por anos tentaria crescer para além daquilo, como quem cresce e deixa um vestido.',
+  'The voice did not outgrow her.': 'A voz não a deixou.',
+
+  /* ---- ch2 ---- */
+  'Łódź. Twelve years later.': 'Łódź. Doze anos depois.',
+  'Her sister begged her to come — one evening of music in Wenecja Park.':
+    'A irmã implorou que ela viesse — uma noite de música no Parque Wenecja.',
+  'Helena wore her one good dress.': 'Helena vestiu seu único vestido bom.',
+  'tap with the music': 'toque no ritmo da música',
+  'The music kept playing. The dancers kept turning.':
+    'A música continuou tocando. Os pares continuaram girando.',
+  'But Helena saw only Him — racked with pain, stripped of His clothing, covered in wounds.':
+    'Mas Helena via somente a Ele — torturado de dor, despojado das vestes, coberto de feridas.',
+  'How long shall I put up with you and how long will you keep putting Me off?':
+    'Até quando hei de suportar-te, e até quando vais Me iludir?',
+  'there is nothing here — hold, and walk away': 'não há nada aqui — segure, e vá embora',
+  'The Cathedral of Saint Stanislaus Kostka. She did not remember walking there.':
+    'A Catedral de Santo Estanislau Kostka. Ela não se lembrava de ter caminhado até lá.',
+  'She fell prostrate before the Blessed Sacrament and asked what He wanted of her.':
+    'Prostrou-se diante do Santíssimo Sacramento e perguntou o que Ele queria dela.',
+  'hold': 'segure',
+  'Go at once to Warsaw; you will enter a convent there.':
+    'Vai imediatamente a Varsóvia; lá entrarás num convento.',
+  'She went home only to pack a small bag, and asked her sister to say goodbye for her.':
+    'Foi para casa apenas para arrumar uma pequena mala, e pediu à irmã que se despedisse por ela.',
+  'She was nineteen, and she had stopped pretending.':
+    'Tinha dezenove anos, e havia parado de fingir.',
+  'THE EVENING': 'A NOITE',
+
+  /* ---- ch3 ---- */
+  'Warsaw. She arrived with one bag and no one waiting.':
+    'Varsóvia. Chegou com uma mala e ninguém à sua espera.',
+  'hold to walk — knock at the doors': 'segure para andar — bata às portas',
+  'We have no place for you.': 'Não temos lugar para você.',
+  'No dowry? Then no.': 'Sem dote? Então não.',
+  'We do not take in maids.': 'Não aceitamos criadas.',
+  'There was another door.': 'Havia outra porta.',
+  'And another.': 'E mais outra.',
+  'She knocked on many doors that summer. The answer learned her face.':
+    'Bateu a muitas portas naquele verão. A recusa aprendeu o rosto dela.',
+  'One door remained — Żytnia Street: the Sisters of Our Lady of Mercy.':
+    'Restava uma porta — rua Żytnia: as Irmãs de Nossa Senhora da Misericórdia.',
+  'The superior, Mother Michael, studied the small girl in the worn dress.':
+    'A superiora, Madre Michael, examinou a pequena moça de vestido gasto.',
+  '“Go and ask the Lord of the house whether He will accept you.”':
+    '“Vá perguntar ao Senhor da casa se Ele a aceita.”',
+  'hold — and ask': 'segure — e pergunte',
+  'I do accept; you are in My Heart.': 'Eu te aceito; estás no Meu Coração.',
+  'Accepted — on one condition. She must earn the clothes she would renounce.':
+    'Aceita — com uma condição. Precisaria pagar o enxoval das vestes que iria renunciar.',
+  'A year in service at Ostrówek: other people’s laundry, other people’s children, coin by coin.':
+    'Um ano de serviço em Ostrówek: roupa dos outros, filhos dos outros, moeda por moeda.',
+  'On the first of August, 1925, the door on Żytnia Street opened to her.':
+    'No primeiro de agosto de 1925, a porta da rua Żytnia se abriu para ela.',
+  'walk in': 'entre',
+
+  /* ---- ch4 ---- */
+  'She received the habit, and with it a new name: Sister Maria Faustyna of the Blessed Sacrament.':
+    'Recebeu o hábito e, com ele, um nome novo: Irmã Maria Faustina do Santíssimo Sacramento.',
+  'She had hoped, perhaps, for ecstasies. She was given the kitchen.':
+    'Ela esperava, talvez, êxtases. Deram-lhe a cozinha.',
+  'hold and move gently — hurry earns nothing': 'segure e mova com suavidade — a pressa não rende nada',
+  'Great love can change small things into great ones, and it is only love which lends value to our actions.':
+    'O amor grande sabe transformar as coisas pequenas em grandes, e somente o amor dá valor aos nossos atos.',
+  'One evening the great pot was too heavy for her strength, and she was ashamed to ask.':
+    'Uma noite, o grande caldeirão pesava mais que as suas forças, e ela teve vergonha de pedir ajuda.',
+  'Out of obedience, she tried again —': 'Por obediência, tentou de novo —',
+  '— and the lifted lid breathed out roses.': '— e a tampa erguida exalou rosas.',
+  'Nothing done for love is small. The years passed this way: Warsaw, Płock, the gardens, the gate.':
+    'Nada feito por amor é pequeno. Os anos passaram assim: Varsóvia, Płock, os jardins, o portão.',
+
+  /* ---- ch5 ---- */
+  'Płock. The evening of the 22nd of February, 1931. She was alone in her cell.':
+    'Płock. A noite de 22 de fevereiro de 1931. Ela estava sozinha em sua cela.',
+  'In the evening, when I was in my cell, I saw the Lord Jesus clothed in a white garment.':
+    'À noite, estando na cela, vi o Senhor Jesus vestido com uma túnica branca.',
+  'Paint an image according to the pattern you see, with the signature: Jesus, I trust in You.':
+    'Pinta uma imagem segundo o modelo que vês, com a inscrição: Jesus, eu confio em Vós.',
+  'I promise that the soul that will venerate this image will not perish.':
+    'Prometo que a alma que venerar esta imagem não perecerá.',
+  'She was twenty-five — a convent cook who had never once held a brush.':
+    'Ela tinha vinte e cinco anos — uma cozinheira de convento que jamais segurara um pincel.',
+  'For three years the command followed her. Confessors shrugged. Superiors frowned.':
+    'Por três anos a ordem a seguiu. Confessores davam de ombros. Superioras franziam o cenho.',
+  'Then, in Vilnius, one priest believed her: Father Michał Sopoćko. He hired a painter, Eugeniusz Kazimirowski, and every week Sister Faustina came to correct the work.':
+    'Então, em Vilnius, um sacerdote acreditou nela: o Padre Michał Sopoćko. Ele contratou um pintor, Eugeniusz Kazimirowski, e toda semana a Irmã Faustina vinha corrigir o trabalho.',
+  'Vilnius, 1934. The painter waits. Show him what you saw.':
+    'Vilnius, 1934. O pintor espera. Mostre a ele o que você viu.',
+  'paint Him — slow, broad strokes of light': 'pinte-O — pinceladas de luz, lentas e largas',
+  'the right hand, raised in blessing': 'a mão direita, erguida em bênção',
+  'from the heart — draw the red ray, downward': 'do coração — trace o raio vermelho, para baixo',
+  'and the pale ray, beside it': 'e o raio pálido, ao lado',
+  'sign it — trace the words, left to right': 'assine — trace as palavras, da esquerda para a direita',
+  'The pale ray stands for the Water which makes souls righteous. The red ray stands for the Blood which is the life of souls. — Diary, 299':
+    'O raio pálido significa a Água que justifica as almas. O raio vermelho significa o Sangue que é a vida das almas. — Diário, 299',
+  'It was finished. And Sister Faustina wept.': 'Estava terminada. E a Irmã Faustina chorou.',
+  '“Who will paint You as beautiful as You are?”': '“Quem Vos pintará tão belo como sois?”',
+  'Not in the beauty of the color, nor of the brush, lies the greatness of this image, but in My grace.':
+    'Nem na beleza das cores, nem do pincel está a grandeza desta imagem, mas na Minha graça.',
+  'Whatever your hand just made — it was enough. It was never about the brush.':
+    'O que a sua mão acabou de fazer — foi suficiente. Nunca foi sobre o pincel.',
+  'In April 1935 the image was hung high in the Gate of Dawn, and a city looked up at it.':
+    'Em abril de 1935 a imagem foi pendurada no alto da Porta da Aurora, e uma cidade ergueu os olhos para ela.',
+
+  /* ---- ch6 ---- */
+  'Vilnius. In September of 1935, she saw in the sky an angel — the executor of God’s wrath, sent to strike the earth.':
+    'Vilnius. Em setembro de 1935, ela viu no céu um anjo — o executor da ira de Deus, enviado para ferir a terra.',
+  'She began to plead for the world — and heard, rising within her, words she had never learned.':
+    'Começou a suplicar pelo mundo — e ouviu, subindo dentro dela, palavras que nunca aprendera.',
+  'press with the slow ring — begin': 'pressione com o anel lento — comece',
+  'Eternal Father, I offer You the Body and Blood, Soul and Divinity of Your dearly beloved Son, Our Lord Jesus Christ, in atonement for our sins and those of the whole world.':
+    'Eterno Pai, eu Vos ofereço o Corpo e Sangue, Alma e Divindade de Vosso diletíssimo Filho, Nosso Senhor Jesus Cristo, em expiação dos nossos pecados e dos do mundo inteiro.',
+  'each small bead — with the ring': 'cada conta pequena — com o anel',
+  'Ten times on the small beads: For the sake of His sorrowful Passion, have mercy on us and on the whole world.':
+    'Dez vezes nas contas pequenas: Pela Sua dolorosa Paixão, tende misericórdia de nós e do mundo inteiro.',
+  'And again. And again — five decades, fifty pleas, on ordinary rosary beads.':
+    'E de novo. E de novo — cinco dezenas, cinquenta súplicas, em contas comuns de rosário.',
+  'hold — and pray on': 'segure — e continue a rezar',
+  'three times — Holy God': 'três vezes — Deus Santo',
+  'The arm did not fall. Before those words, the angel stood helpless — and the storm knelt.':
+    'O braço não caiu. Diante daquelas palavras, o anjo ficou impotente — e a tempestade se ajoelhou.',
+  'Whoever will recite it will receive great mercy at the hour of death.':
+    'Quem o rezar receberá grande misericórdia na hora da morte.',
+  'She wrote the words down. The world still prays them every day, at three o’clock, on ordinary beads.':
+    'Ela escreveu as palavras. O mundo ainda as reza todos os dias, às três horas, em contas comuns.',
+  'for the sake of His sorrowful Passion, have mercy on us and on the whole world':
+    'pela Sua dolorosa Paixão, tende misericórdia de nós e do mundo inteiro',
+  'Holy God…': 'Deus Santo…',
+  'Holy Mighty One…': 'Santo Forte…',
+  'Holy Immortal One…': 'Santo Imortal…',
+
+  /* ---- ch7 ---- */
+  'Kraków. Hard years. The convent made her portress — keeper of the gate.':
+    'Cracóvia. Anos difíceis. O convento a fez porteira — guardiã do portão.',
+  'The poor of the city learned which gate gave soup, and the line learned her name.':
+    'Os pobres da cidade aprenderam qual portão dava sopa, e a fila aprendeu o nome dela.',
+  'a mother, a child asleep on her shoulder': 'uma mãe, com uma criança adormecida no ombro',
+  '“Bread, sister. Not for me.”': '“Pão, irmã. Não é para mim.”',
+  'The loaf passed through the bars. The child did not wake — but the mother closed her eyes.':
+    'O pão passou pelas grades. A criança não acordou — mas a mãe fechou os olhos.',
+  '“They are beautiful, your little one.” The woman looked up as if no one had spoken to her in weeks.':
+    '“É lindo, o seu pequeno.” A mulher ergueu o olhar como se ninguém lhe falasse havia semanas.',
+  'She prayed in silence. The woman left no lighter — but not alone.':
+    'Ela rezou em silêncio. A mulher partiu sem peso a menos — mas não sozinha.',
+  'an old man, coat thin as paper': 'um velho, de casaco fino como papel',
+  '“Only to stand out of the rain a moment.”': '“Só para ficar um momento fora da chuva.”',
+  'Bread, and the dry corner of the gateway. He ate slowly, saving half.':
+    'Pão, e o canto seco do portal. Ele comeu devagar, guardando metade.',
+  'They spoke of the harvests before the war. For a moment he was forty years younger.':
+    'Falaram das colheitas de antes da guerra. Por um momento ele ficou quarenta anos mais jovem.',
+  'She held him in her prayer. He straightened a little, as if the coat had thickened.':
+    'Ela o sustentou em sua oração. Ele se aprumou um pouco, como se o casaco tivesse engrossado.',
+  'a young man with hard eyes': 'um rapaz de olhos duros',
+  '“God has forgotten this city. Don’t waste your bread on me.”':
+    '“Deus esqueceu esta cidade. Não desperdice seu pão comigo.”',
+  'He took the loaf like an accusation. At the corner, he looked back once.':
+    'Ele pegou o pão como uma acusação. Na esquina, olhou para trás uma vez.',
+  '“He has not forgotten you. I know it the way I know it is raining.” He had no answer for that.':
+    '“Ele não esqueceu você. Sei disso como sei que está chovendo.” Para isso ele não tinha resposta.',
+  'No words would land. She prayed instead — the long way around a locked door.':
+    'Nenhuma palavra alcançava. Ela rezou em vez disso — o caminho longo ao redor de uma porta trancada.',
+  'a widow who says nothing at all': 'uma viúva que não diz nada',
+  'Bread, wrapped in cloth, pressed into silent hands.':
+    'Pão, enrolado em pano, posto em mãos silenciosas.',
+  'No answer came. Some griefs only want company; she stood with her in the rain.':
+    'Nenhuma resposta veio. Algumas dores só querem companhia; ela ficou com ela na chuva.',
+  'For the silent, silence that listens upward. The widow lifted her face into the rain like a blessing.':
+    'Para os calados, um silêncio que escuta para o alto. A viúva ergueu o rosto à chuva como a uma bênção.',
+  'Toward evening, when the pots were nearly empty, one more figure came through the rain.':
+    'Ao entardecer, quando as panelas já estavam quase vazias, mais um vulto veio pela chuva.',
+  'a young man — barefoot, bareheaded, his clothes frozen to him':
+    'um jovem — descalço, de cabeça descoberta, as roupas congeladas no corpo',
+  '“Something hot, if you can.”': '“Algo quente, se puder.”',
+  'There was bread in the basket still. She gave him all of it — and went to the kitchen besides, and brought him soup, full of crumbs.':
+    'Ainda havia pão na cesta. Ela lhe deu tudo — e ainda foi à cozinha e trouxe-lhe sopa, cheia de migalhas.',
+  'There was no bread left to weigh, no choice to make. She went to the kitchen and brought him soup, full of crumbs.':
+    'Não havia mais pão para pesar, nem escolha a fazer. Ela foi à cozinha e trouxe-lhe sopa, cheia de migalhas.',
+  'He ate. And as she took back the bowl, the rain forgot to fall.':
+    'Ele comeu. E quando ela recolheu a tigela, a chuva esqueceu de cair.',
+  'My daughter, the blessings of the poor who bless Me as they leave this gate have reached My ears. And this is why I came down from My throne — to taste the fruits of your mercy.':
+    'Minha filha, chegaram aos Meus ouvidos as bênçãos dos pobres que Me bendizem ao deixar este portão. E por isso desci do Meu trono — para provar os frutos da tua misericórdia.',
+  'I am giving you three ways of exercising mercy toward your neighbor: the first — by deed, the second — by word, the third — by prayer.':
+    'Dou-te três maneiras de exercer misericórdia para com o próximo: a primeira — pela ação; a segunda — pela palavra; a terceira — pela oração.',
+  'Help me, O Lord, that my eyes may be merciful, so that I may never suspect or judge from appearances, but look for what is beautiful in my neighbors’ souls.':
+    'Ajudai-me, Senhor, para que os meus olhos sejam misericordiosos, para que eu jamais suspeite ou julgue pelas aparências, mas busque o que é belo na alma do meu próximo.',
+  'Deed': 'Ação',
+  'Word': 'Palavra',
+  'Prayer': 'Oração',
+  'give bread — {n} left': 'dar pão — restam {n}',
+  'no bread left': 'não resta pão',
+  'stay, and speak': 'ficar, e falar',
+  'hold a moment': 'segurar um momento',
+  'the young man': 'o jovem',
+
+  /* ---- ch8 ---- */
+  'The tuberculosis reached her lungs, then everything else. They sent her to the sanatorium at Prądnik.':
+    'A tuberculose alcançou seus pulmões, depois todo o resto. Mandaram-na para o sanatório de Prądnik.',
+  'And there, the visions stopped. The voice stopped. Heaven went dark and silent as this garden.':
+    'E ali, as visões cessaram. A voz cessou. O Céu ficou escuro e silencioso como este jardim.',
+  'hold —': 'segure —',
+  '…nothing answers. keep walking.': '…nada responde. continue andando.',
+  'She kept a dry record of those weeks. No comfort in it — only this:':
+    'Ela manteve um registro seco daquelas semanas. Nenhum consolo nele — apenas isto:',
+  'Suffering is a great grace; through suffering the soul becomes like the Savior; in suffering love becomes crystallized.':
+    'O sofrimento é uma grande graça; pelo sofrimento a alma se assemelha ao Salvador; no sofrimento o amor se cristaliza.',
+  'As often as you hear the clock strike the third hour, immerse yourself completely in My mercy, adoring and glorifying it.':
+    'Todas as vezes que ouvires o relógio bater a terceira hora, imerge-te toda na Minha misericórdia, adorando-a e glorificando-a.',
+  'In this hour, I will refuse nothing to the soul that makes a request of Me in virtue of My Passion.':
+    'Nesta hora, nada negarei à alma que Me pedir em virtude da Minha Paixão.',
+  'The flame had not answered her holding. It returned anyway — not earned. Given.':
+    'A chama não respondera ao seu segurar. Voltou assim mesmo — não conquistada. Dada.',
+  'The graces of My mercy are drawn by means of one vessel only, and that is — trust. The more a soul trusts, the more it will receive.':
+    'As graças da Minha misericórdia se recebem com um único vaso, que é — a confiança. Quanto mais a alma confiar, tanto mais receberá.',
+  'where is He now?': 'onde está Ele agora?',
+  'you imagined all of it': 'você imaginou tudo isso',
+  'a cook — a prophet?': 'uma cozinheira — profetisa?',
+  'no one believes you': 'ninguém acredita em você',
+  'the night has no far side': 'a noite não tem outra margem',
+  'He has gone quiet, hasn’t He': 'Ele se calou, não foi',
+
+  /* ---- ch9 ---- */
+  'Kraków-Łagiewniki. The night of the fifth of October, 1938.':
+    'Cracóvia-Łagiewniki. A noite de cinco de outubro de 1938.',
+  'She was thirty-three — the age of her Lord.':
+    'Ela tinha trinta e três anos — a idade do seu Senhor.',
+  'breathe with her — hold… and release': 'respire com ela — segure… e solte',
+  'The sisters knelt at the bed. The candle kept its small vigil.':
+    'As irmãs se ajoelharam junto à cama. A vela mantinha sua pequena vigília.',
+  'You are the secretary of My mercy; I have chosen you for that office in this life and the next life.':
+    'Tu és a secretária da Minha misericórdia; escolhi-te para esse ofício nesta vida e na vida futura.',
+  '— let go': '— solte',
+
+  /* ---- epilogue ---- */
+  'She was buried in the convent garden at Łagiewniki.':
+    'Foi sepultada no jardim do convento em Łagiewniki.',
+  '1939. A year later, the darkness she had been shown swept out of the same sky.':
+    '1939. Um ano depois, a escuridão que lhe fora mostrada varreu o mesmo céu.',
+  'But in hidden chapels, the Image was copied, and copied again.':
+    'Mas em capelas escondidas, a Imagem foi copiada, e copiada de novo.',
+  '1959. Rome — misled by a faulty translation of her Diary — silenced the devotion.':
+    '1959. Roma — induzida ao erro por uma tradução defeituosa do seu Diário — silenciou a devoção.',
+  'The archbishop of Kraków would not let her rest in obscurity: Karol Wojtyła.':
+    'O arcebispo de Cracóvia não a deixaria repousar na obscuridade: Karol Wojtyła.',
+  '1978. The ban was lifted. Six months later the world learned the archbishop’s new name — John Paul II.':
+    '1978. A proibição foi retirada. Seis meses depois o mundo aprendeu o novo nome do arcebispo — João Paulo II.',
+  '30 April 2000. Helena Kowalska — Sister Faustina — was declared a saint: the first of the Great Jubilee.':
+    '30 de abril de 2000. Helena Kowalska — Irmã Faustina — foi declarada santa: a primeira do Grande Jubileu.',
+  'And the Church received a new feast: the Second Sunday of Easter — Divine Mercy Sunday.':
+    'E a Igreja recebeu uma nova festa: o segundo domingo da Páscoa — o Domingo da Divina Misericórdia.',
+  'Somewhere on earth, it is always three o’clock.':
+    'Em algum lugar da terra, são sempre três horas.',
+  'And the image you painted in Vilnius —': 'E a imagem que você pintou em Vilnius —',
+  'Jezu, ufam Tobie — Jesus, I trust in You': 'Jezu, ufam Tobie — Jesus, eu confio em Vós',
+  'painted by your hand · Vilnius, 1934': 'pintada pela sua mão · Vilnius, 1934',
+  '— became this one, by Eugeniusz Kazimirowski · Vilnius, 1934':
+    '— tornou-se esta, de Eugeniusz Kazimirowski · Vilnius, 1934',
+  '“Not in the beauty of the color, nor of the brush… but in My grace.”':
+    '“Nem na beleza das cores, nem do pincel… mas na Minha graça.”',
+  'vessel of mercy — a story from the Diary of Saint Faustina Kowalska':
+    'vaso de misericórdia — uma história do Diário de Santa Faustina Kowalska',
+};
+
+
+/* ============ 05c-lang-it.js ============ */
+/* Italiano. Le chiavi sono le frasi originali in inglese. */
+
+I18N.dict.it = {
+  /* ---- title ---- */
+  'VESSEL OF MERCY': 'VASO DI MISERICORDIA',
+  'FROM THE DIARY OF SAINT FAUSTINA KOWALSKA': 'DAL DIARIO DI SANTA FAUSTINA KOWALSKA',
+  'it is the Hour of Mercy now': 'è l’Ora della Misericordia, adesso',
+  'touch anywhere': 'tocca ovunque',
+  'Continue': 'Continua',
+  'Begin again': 'Ricomincia',
+  'from Głogowiec': 'da Głogowiec',
+  'The keepsake': 'Il ricordo',
+  'return to your painting': 'torna al tuo dipinto',
+  'Begin': 'Inizia',
+  'a true story, gently told': 'una storia vera, narrata con dolcezza',
+  'chapter': 'capitolo',
+  'Chapter': 'Capitolo',
+
+  /* ---- menu ---- */
+  'Return': 'Torna',
+  'Restart chapter': 'Ricomincia il capitolo',
+  'sound': 'suono',
+  'calm motion': 'movimento calmo',
+  'A story drawn from the Diary of Saint Faustina Kowalska (1905–1938). Quotations cited as “Diary, n.” are from <i>Diary: Divine Mercy in My Soul</i>, © 1987 Congregation of Marians of the Immaculate Conception.':
+    'Una storia tratta dal Diario di Santa Faustina Kowalska (1905–1938). Le citazioni indicate come “Diario, n.” provengono dal <i>Diario: La Misericordia Divina nella mia anima</i>, © 1987 Congregazione dei Padri Mariani dell’Immacolata Concezione.',
+  'sound off — M': 'audio spento — M',
+  'sound on': 'audio acceso',
+
+  /* ---- chapter registry ---- */
+  'A Voice in the Night': 'Una Voce nella Notte',
+  'The Dance': 'Il Ballo',
+  'The Doors': 'Le Porte',
+  'Small Things': 'Piccole Cose',
+  'Paint an Image': 'Dipingi un’Immagine',
+  'The Chaplet': 'La Coroncina',
+  'The Gate': 'Il Cancello',
+  'The Dark Night': 'La Notte Oscura',
+  'The Spark': 'La Scintilla',
+  'The Spark (epilogue)': 'La Scintilla (epilogo)',
+  'Warsaw · 1925': 'Varsavia · 1925',
+  'The Convent · 1926–1930': 'Il Convento · 1926–1930',
+  'Płock · 22 February 1931': 'Płock · 22 febbraio 1931',
+  'Vilnius · September 1935': 'Vilnius · settembre 1935',
+  'Kraków · 1937': 'Cracovia · 1937',
+  'Prądnik Sanatorium · 1938': 'Sanatorio di Prądnik · 1938',
+  'Kraków-Łagiewniki · 5 October 1938': 'Cracovia-Łagiewniki · 5 ottobre 1938',
+  '1938 — today': '1938 — oggi',
+
+  /* ---- ch1 ---- */
+  'Głogowiec, central Poland. A farmhouse with ten children and never quite enough bread.':
+    'Głogowiec, Polonia centrale. Una casa di campagna con dieci figli e mai abbastanza pane.',
+  'The third child, Helena, woke in the night. Something was calling her by name.':
+    'La terza figlia, Helena, si svegliò nella notte. Qualcosa la chiamava per nome.',
+  'hold — and stay awhile': 'tieni premuto — e resta un poco',
+  'It was in the seventh year of my life that, for the first time, I heard God’s voice in my soul; that is, an invitation to a more perfect life.':
+    'Fu nel settimo anno della mia vita che, per la prima volta, udii la voce di Dio nell’anima, cioè l’invito a una vita più perfetta.',
+  'She was seven. For years she would try to outgrow it, the way one outgrows a dress.':
+    'Aveva sette anni. Per anni avrebbe cercato di crescere oltre quella voce, come si cresce oltre un vestito.',
+  'The voice did not outgrow her.': 'La voce non crebbe oltre lei.',
+
+  /* ---- ch2 ---- */
+  'Łódź. Twelve years later.': 'Łódź. Dodici anni dopo.',
+  'Her sister begged her to come — one evening of music in Wenecja Park.':
+    'Sua sorella la supplicò di venire — una sera di musica al parco Wenecja.',
+  'Helena wore her one good dress.': 'Helena indossò il suo unico vestito buono.',
+  'tap with the music': 'tocca a ritmo di musica',
+  'The music kept playing. The dancers kept turning.':
+    'La musica continuava a suonare. I ballerini continuavano a girare.',
+  'But Helena saw only Him — racked with pain, stripped of His clothing, covered in wounds.':
+    'Ma Helena vedeva solo Lui — straziato dal dolore, spogliato delle vesti, coperto di piaghe.',
+  'How long shall I put up with you and how long will you keep putting Me off?':
+    'Fino a quando ti sopporterò e fino a quando continuerai a rimandarmi?',
+  'there is nothing here — hold, and walk away': 'qui non c’è nulla — tieni premuto, e va’ via',
+  'The Cathedral of Saint Stanislaus Kostka. She did not remember walking there.':
+    'La cattedrale di San Stanislao Kostka. Non ricordava di averci camminato fino a lì.',
+  'She fell prostrate before the Blessed Sacrament and asked what He wanted of her.':
+    'Si prostrò davanti al Santissimo Sacramento e chiese che cosa Egli volesse da lei.',
+  'hold': 'tieni premuto',
+  'Go at once to Warsaw; you will enter a convent there.':
+    'Parti subito per Varsavia; là entrerai in convento.',
+  'She went home only to pack a small bag, and asked her sister to say goodbye for her.':
+    'Tornò a casa solo per preparare una piccola borsa, e chiese alla sorella di salutare per lei.',
+  'She was nineteen, and she had stopped pretending.':
+    'Aveva diciannove anni, e aveva smesso di fingere.',
+  'THE EVENING': 'LA SERATA',
+
+  /* ---- ch3 ---- */
+  'Warsaw. She arrived with one bag and no one waiting.':
+    'Varsavia. Arrivò con una borsa e nessuno ad aspettarla.',
+  'hold to walk — knock at the doors': 'tieni premuto per camminare — bussa alle porte',
+  'We have no place for you.': 'Non abbiamo posto per te.',
+  'No dowry? Then no.': 'Niente dote? Allora no.',
+  'We do not take in maids.': 'Non accettiamo domestiche.',
+  'There was another door.': 'C’era un’altra porta.',
+  'And another.': 'E un’altra ancora.',
+  'She knocked on many doors that summer. The answer learned her face.':
+    'Bussò a molte porte quell’estate. Il rifiuto imparò il suo volto.',
+  'One door remained — Żytnia Street: the Sisters of Our Lady of Mercy.':
+    'Restava una porta — via Żytnia: le Suore della Madonna della Misericordia.',
+  'The superior, Mother Michael, studied the small girl in the worn dress.':
+    'La superiora, Madre Michael, osservò la piccola ragazza dal vestito logoro.',
+  '“Go and ask the Lord of the house whether He will accept you.”':
+    '“Va’ a chiedere al Signore della casa se ti accetta.”',
+  'hold — and ask': 'tieni premuto — e chiedi',
+  'I do accept; you are in My Heart.': 'Ti accetto; sei nel Mio Cuore.',
+  'Accepted — on one condition. She must earn the clothes she would renounce.':
+    'Accettata — a una condizione. Doveva guadagnarsi il corredo delle vesti a cui avrebbe rinunciato.',
+  'A year in service at Ostrówek: other people’s laundry, other people’s children, coin by coin.':
+    'Un anno a servizio a Ostrówek: il bucato degli altri, i figli degli altri, moneta dopo moneta.',
+  'On the first of August, 1925, the door on Żytnia Street opened to her.':
+    'Il primo agosto 1925, la porta di via Żytnia si aprì per lei.',
+  'walk in': 'entra',
+
+  /* ---- ch4 ---- */
+  'She received the habit, and with it a new name: Sister Maria Faustyna of the Blessed Sacrament.':
+    'Ricevette l’abito e, con esso, un nome nuovo: Suor Maria Faustina del Santissimo Sacramento.',
+  'She had hoped, perhaps, for ecstasies. She was given the kitchen.':
+    'Sperava, forse, in estasi. Le fu data la cucina.',
+  'hold and move gently — hurry earns nothing': 'tieni premuto e muovi con dolcezza — la fretta non rende nulla',
+  'Great love can change small things into great ones, and it is only love which lends value to our actions.':
+    'L’amore grande sa trasformare le piccole cose in grandi, e solo l’amore dà valore alle nostre azioni.',
+  'One evening the great pot was too heavy for her strength, and she was ashamed to ask.':
+    'Una sera il grande pentolone era troppo pesante per le sue forze, e si vergognava di chiedere aiuto.',
+  'Out of obedience, she tried again —': 'Per obbedienza, provò di nuovo —',
+  '— and the lifted lid breathed out roses.': '— e il coperchio sollevato esalò rose.',
+  'Nothing done for love is small. The years passed this way: Warsaw, Płock, the gardens, the gate.':
+    'Nulla di ciò che è fatto per amore è piccolo. Gli anni passarono così: Varsavia, Płock, i giardini, il cancello.',
+
+  /* ---- ch5 ---- */
+  'Płock. The evening of the 22nd of February, 1931. She was alone in her cell.':
+    'Płock. La sera del 22 febbraio 1931. Era sola nella sua cella.',
+  'In the evening, when I was in my cell, I saw the Lord Jesus clothed in a white garment.':
+    'La sera, stando nella mia cella, vidi il Signore Gesù vestito di una veste bianca.',
+  'Paint an image according to the pattern you see, with the signature: Jesus, I trust in You.':
+    'Dipingi un’immagine secondo il modello che vedi, con la scritta: Gesù, confido in Te.',
+  'I promise that the soul that will venerate this image will not perish.':
+    'Prometto che l’anima che venererà quest’immagine non perirà.',
+  'She was twenty-five — a convent cook who had never once held a brush.':
+    'Aveva venticinque anni — una cuoca di convento che non aveva mai tenuto un pennello.',
+  'For three years the command followed her. Confessors shrugged. Superiors frowned.':
+    'Per tre anni il comando la seguì. I confessori alzavano le spalle. Le superiore aggrottavano la fronte.',
+  'Then, in Vilnius, one priest believed her: Father Michał Sopoćko. He hired a painter, Eugeniusz Kazimirowski, and every week Sister Faustina came to correct the work.':
+    'Poi, a Vilnius, un sacerdote le credette: padre Michał Sopoćko. Ingaggiò un pittore, Eugeniusz Kazimirowski, e ogni settimana suor Faustina veniva a correggere il lavoro.',
+  'Vilnius, 1934. The painter waits. Show him what you saw.':
+    'Vilnius, 1934. Il pittore aspetta. Mostragli ciò che hai visto.',
+  'paint Him — slow, broad strokes of light': 'dipingiLo — pennellate di luce, lente e ampie',
+  'the right hand, raised in blessing': 'la mano destra, alzata in benedizione',
+  'from the heart — draw the red ray, downward': 'dal cuore — traccia il raggio rosso, verso il basso',
+  'and the pale ray, beside it': 'e il raggio pallido, accanto',
+  'sign it — trace the words, left to right': 'firma — traccia le parole, da sinistra a destra',
+  'The pale ray stands for the Water which makes souls righteous. The red ray stands for the Blood which is the life of souls. — Diary, 299':
+    'Il raggio pallido significa l’Acqua che giustifica le anime. Il raggio rosso significa il Sangue che è la vita delle anime. — Diario, 299',
+  'It was finished. And Sister Faustina wept.': 'Era finito. E suor Faustina pianse.',
+  '“Who will paint You as beautiful as You are?”': '“Chi Ti dipingerà bello come sei?”',
+  'Not in the beauty of the color, nor of the brush, lies the greatness of this image, but in My grace.':
+    'Non nella bellezza dei colori, né del pennello sta la grandezza di quest’immagine, ma nella Mia grazia.',
+  'Whatever your hand just made — it was enough. It was never about the brush.':
+    'Qualunque cosa la tua mano abbia appena fatto — era abbastanza. Non è mai stata questione di pennello.',
+  'In April 1935 the image was hung high in the Gate of Dawn, and a city looked up at it.':
+    'Nell’aprile 1935 l’immagine fu appesa in alto nella Porta dell’Aurora, e una città alzò gli occhi verso di lei.',
+
+  /* ---- ch6 ---- */
+  'Vilnius. In September of 1935, she saw in the sky an angel — the executor of God’s wrath, sent to strike the earth.':
+    'Vilnius. Nel settembre 1935 vide nel cielo un angelo — l’esecutore dell’ira di Dio, mandato a colpire la terra.',
+  'She began to plead for the world — and heard, rising within her, words she had never learned.':
+    'Cominciò a supplicare per il mondo — e udì salire dentro di sé parole che non aveva mai imparato.',
+  'press with the slow ring — begin': 'premi con l’anello lento — comincia',
+  'Eternal Father, I offer You the Body and Blood, Soul and Divinity of Your dearly beloved Son, Our Lord Jesus Christ, in atonement for our sins and those of the whole world.':
+    'Eterno Padre, Ti offro il Corpo e il Sangue, l’Anima e la Divinità del Tuo dilettissimo Figlio e Signore nostro Gesù Cristo, in espiazione dei nostri peccati e di quelli del mondo intero.',
+  'each small bead — with the ring': 'ogni grano piccolo — con l’anello',
+  'Ten times on the small beads: For the sake of His sorrowful Passion, have mercy on us and on the whole world.':
+    'Dieci volte sui grani piccoli: Per la Sua dolorosa Passione, abbi misericordia di noi e del mondo intero.',
+  'And again. And again — five decades, fifty pleas, on ordinary rosary beads.':
+    'E di nuovo. E di nuovo — cinque decine, cinquanta suppliche, su comuni grani di rosario.',
+  'hold — and pray on': 'tieni premuto — e continua a pregare',
+  'three times — Holy God': 'tre volte — Santo Dio',
+  'The arm did not fall. Before those words, the angel stood helpless — and the storm knelt.':
+    'Il braccio non cadde. Davanti a quelle parole l’angelo restò impotente — e la tempesta s’inginocchiò.',
+  'Whoever will recite it will receive great mercy at the hour of death.':
+    'Chi la reciterà riceverà grande misericordia nell’ora della morte.',
+  'She wrote the words down. The world still prays them every day, at three o’clock, on ordinary beads.':
+    'Lei scrisse quelle parole. Il mondo le prega ancora ogni giorno, alle tre, su grani comuni.',
+  'for the sake of His sorrowful Passion, have mercy on us and on the whole world':
+    'per la Sua dolorosa Passione, abbi misericordia di noi e del mondo intero',
+  'Holy God…': 'Santo Dio…',
+  'Holy Mighty One…': 'Santo Forte…',
+  'Holy Immortal One…': 'Santo Immortale…',
+
+  /* ---- ch7 ---- */
+  'Kraków. Hard years. The convent made her portress — keeper of the gate.':
+    'Cracovia. Anni duri. Il convento la fece portinaia — custode del cancello.',
+  'The poor of the city learned which gate gave soup, and the line learned her name.':
+    'I poveri della città impararono quale cancello dava la minestra, e la fila imparò il suo nome.',
+  'a mother, a child asleep on her shoulder': 'una madre, con un bambino addormentato sulla spalla',
+  '“Bread, sister. Not for me.”': '“Pane, sorella. Non per me.”',
+  'The loaf passed through the bars. The child did not wake — but the mother closed her eyes.':
+    'La pagnotta passò tra le sbarre. Il bambino non si svegliò — ma la madre chiuse gli occhi.',
+  '“They are beautiful, your little one.” The woman looked up as if no one had spoken to her in weeks.':
+    '“È bello, il tuo piccolo.” La donna alzò lo sguardo come se nessuno le parlasse da settimane.',
+  'She prayed in silence. The woman left no lighter — but not alone.':
+    'Pregò in silenzio. La donna se ne andò senza un peso in meno — ma non sola.',
+  'an old man, coat thin as paper': 'un vecchio, con un cappotto sottile come carta',
+  '“Only to stand out of the rain a moment.”': '“Solo per stare un momento fuori dalla pioggia.”',
+  'Bread, and the dry corner of the gateway. He ate slowly, saving half.':
+    'Pane, e l’angolo asciutto dell’androne. Mangiò lentamente, conservandone metà.',
+  'They spoke of the harvests before the war. For a moment he was forty years younger.':
+    'Parlarono dei raccolti di prima della guerra. Per un momento ebbe quarant’anni di meno.',
+  'She held him in her prayer. He straightened a little, as if the coat had thickened.':
+    'Lo tenne nella sua preghiera. Lui si raddrizzò un poco, come se il cappotto si fosse infoltito.',
+  'a young man with hard eyes': 'un giovane dagli occhi duri',
+  '“God has forgotten this city. Don’t waste your bread on me.”':
+    '“Dio ha dimenticato questa città. Non sprecare il tuo pane con me.”',
+  'He took the loaf like an accusation. At the corner, he looked back once.':
+    'Prese la pagnotta come un’accusa. All’angolo, si voltò una volta.',
+  '“He has not forgotten you. I know it the way I know it is raining.” He had no answer for that.':
+    '“Lui non ti ha dimenticato. Lo so come so che sta piovendo.” A questo non seppe rispondere.',
+  'No words would land. She prayed instead — the long way around a locked door.':
+    'Nessuna parola arrivava. Pregò invece — la via lunga attorno a una porta chiusa.',
+  'a widow who says nothing at all': 'una vedova che non dice nulla',
+  'Bread, wrapped in cloth, pressed into silent hands.':
+    'Pane, avvolto in un panno, posato in mani silenziose.',
+  'No answer came. Some griefs only want company; she stood with her in the rain.':
+    'Nessuna risposta venne. Certi dolori vogliono solo compagnia; lei rimase con lei sotto la pioggia.',
+  'For the silent, silence that listens upward. The widow lifted her face into the rain like a blessing.':
+    'Per chi tace, un silenzio che ascolta verso l’alto. La vedova alzò il viso alla pioggia come a una benedizione.',
+  'Toward evening, when the pots were nearly empty, one more figure came through the rain.':
+    'Verso sera, quando le pentole erano quasi vuote, un’altra figura venne attraverso la pioggia.',
+  'a young man — barefoot, bareheaded, his clothes frozen to him':
+    'un giovane — scalzo, a capo scoperto, con i vestiti gelati addosso',
+  '“Something hot, if you can.”': '“Qualcosa di caldo, se puoi.”',
+  'There was bread in the basket still. She gave him all of it — and went to the kitchen besides, and brought him soup, full of crumbs.':
+    'C’era ancora pane nel cesto. Glielo diede tutto — e andò inoltre in cucina e gli portò una minestra, piena di briciole.',
+  'There was no bread left to weigh, no choice to make. She went to the kitchen and brought him soup, full of crumbs.':
+    'Non c’era più pane da pesare, nessuna scelta da fare. Andò in cucina e gli portò una minestra, piena di briciole.',
+  'He ate. And as she took back the bowl, the rain forgot to fall.':
+    'Lui mangiò. E mentre lei riprendeva la ciotola, la pioggia dimenticò di cadere.',
+  'My daughter, the blessings of the poor who bless Me as they leave this gate have reached My ears. And this is why I came down from My throne — to taste the fruits of your mercy.':
+    'Figlia Mia, sono giunte alle Mie orecchie le benedizioni dei poveri che Mi benedicono lasciando questo cancello. E per questo sono sceso dal Mio trono — per gustare i frutti della tua misericordia.',
+  'I am giving you three ways of exercising mercy toward your neighbor: the first — by deed, the second — by word, the third — by prayer.':
+    'Ti do tre modi di esercitare la misericordia verso il prossimo: il primo — con le opere; il secondo — con la parola; il terzo — con la preghiera.',
+  'Help me, O Lord, that my eyes may be merciful, so that I may never suspect or judge from appearances, but look for what is beautiful in my neighbors’ souls.':
+    'Aiutami, Signore, perché i miei occhi siano misericordiosi, perché io non sospetti né giudichi mai dalle apparenze, ma cerchi ciò che è bello nell’anima del mio prossimo.',
+  'Deed': 'Opera',
+  'Word': 'Parola',
+  'Prayer': 'Preghiera',
+  'give bread — {n} left': 'dare il pane — ne restano {n}',
+  'no bread left': 'non resta pane',
+  'stay, and speak': 'restare, e parlare',
+  'hold a moment': 'tenere premuto un momento',
+  'the young man': 'il giovane',
+
+  /* ---- ch8 ---- */
+  'The tuberculosis reached her lungs, then everything else. They sent her to the sanatorium at Prądnik.':
+    'La tubercolosi raggiunse i polmoni, poi tutto il resto. La mandarono al sanatorio di Prądnik.',
+  'And there, the visions stopped. The voice stopped. Heaven went dark and silent as this garden.':
+    'E lì, le visioni cessarono. La voce cessò. Il Cielo si fece buio e silenzioso come questo giardino.',
+  'hold —': 'tieni premuto —',
+  '…nothing answers. keep walking.': '…niente risponde. continua a camminare.',
+  'She kept a dry record of those weeks. No comfort in it — only this:':
+    'Tenne un registro asciutto di quelle settimane. Nessun conforto — solo questo:',
+  'Suffering is a great grace; through suffering the soul becomes like the Savior; in suffering love becomes crystallized.':
+    'La sofferenza è una grande grazia; attraverso la sofferenza l’anima diventa simile al Salvatore; nella sofferenza l’amore si cristallizza.',
+  'As often as you hear the clock strike the third hour, immerse yourself completely in My mercy, adoring and glorifying it.':
+    'Ogni volta che senti l’orologio battere la terza ora, immergiti tutta nella Mia misericordia, adorandola e glorificandola.',
+  'In this hour, I will refuse nothing to the soul that makes a request of Me in virtue of My Passion.':
+    'In quest’ora non rifiuterò nulla all’anima che Mi chiede qualcosa in virtù della Mia Passione.',
+  'The flame had not answered her holding. It returned anyway — not earned. Given.':
+    'La fiamma non aveva risposto al suo tenere. Tornò comunque — non guadagnata. Donata.',
+  'The graces of My mercy are drawn by means of one vessel only, and that is — trust. The more a soul trusts, the more it will receive.':
+    'Le grazie della Mia misericordia si attingono con un solo vaso, ed è — la fiducia. Più un’anima confida, più riceverà.',
+  'where is He now?': 'dov’è Lui adesso?',
+  'you imagined all of it': 'hai immaginato tutto',
+  'a cook — a prophet?': 'una cuoca — profetessa?',
+  'no one believes you': 'nessuno ti crede',
+  'the night has no far side': 'la notte non ha un’altra riva',
+  'He has gone quiet, hasn’t He': 'Si è fatto silenzioso, vero',
+
+  /* ---- ch9 ---- */
+  'Kraków-Łagiewniki. The night of the fifth of October, 1938.':
+    'Cracovia-Łagiewniki. La notte del cinque ottobre 1938.',
+  'She was thirty-three — the age of her Lord.':
+    'Aveva trentatré anni — l’età del suo Signore.',
+  'breathe with her — hold… and release': 'respira con lei — trattieni… e lascia andare',
+  'The sisters knelt at the bed. The candle kept its small vigil.':
+    'Le sorelle si inginocchiarono al letto. La candela manteneva la sua piccola veglia.',
+  'You are the secretary of My mercy; I have chosen you for that office in this life and the next life.':
+    'Tu sei la segretaria della Mia misericordia; ti ho scelta per questo ufficio in questa vita e nella vita futura.',
+  '— let go': '— lascia andare',
+
+  /* ---- epilogue ---- */
+  'She was buried in the convent garden at Łagiewniki.':
+    'Fu sepolta nel giardino del convento a Łagiewniki.',
+  '1939. A year later, the darkness she had been shown swept out of the same sky.':
+    '1939. Un anno dopo, l’oscurità che le era stata mostrata dilagò dallo stesso cielo.',
+  'But in hidden chapels, the Image was copied, and copied again.':
+    'Ma in cappelle nascoste, l’Immagine fu copiata, e copiata ancora.',
+  '1959. Rome — misled by a faulty translation of her Diary — silenced the devotion.':
+    '1959. Roma — tratta in errore da una traduzione difettosa del suo Diario — mise a tacere la devozione.',
+  'The archbishop of Kraków would not let her rest in obscurity: Karol Wojtyła.':
+    'L’arcivescovo di Cracovia non la lasciò riposare nell’oscurità: Karol Wojtyła.',
+  '1978. The ban was lifted. Six months later the world learned the archbishop’s new name — John Paul II.':
+    '1978. Il divieto fu revocato. Sei mesi dopo il mondo imparò il nuovo nome dell’arcivescovo — Giovanni Paolo II.',
+  '30 April 2000. Helena Kowalska — Sister Faustina — was declared a saint: the first of the Great Jubilee.':
+    '30 aprile 2000. Helena Kowalska — suor Faustina — fu dichiarata santa: la prima del Grande Giubileo.',
+  'And the Church received a new feast: the Second Sunday of Easter — Divine Mercy Sunday.':
+    'E la Chiesa ricevette una nuova festa: la seconda domenica di Pasqua — la Domenica della Divina Misericordia.',
+  'Somewhere on earth, it is always three o’clock.':
+    'Da qualche parte sulla terra, sono sempre le tre.',
+  'And the image you painted in Vilnius —': 'E l’immagine che hai dipinto a Vilnius —',
+  'Jezu, ufam Tobie — Jesus, I trust in You': 'Jezu, ufam Tobie — Gesù, confido in Te',
+  'painted by your hand · Vilnius, 1934': 'dipinta dalla tua mano · Vilnius, 1934',
+  '— became this one, by Eugeniusz Kazimirowski · Vilnius, 1934':
+    '— divenne questa, di Eugeniusz Kazimirowski · Vilnius, 1934',
+  '“Not in the beauty of the color, nor of the brush… but in My grace.”':
+    '“Non nella bellezza dei colori, né del pennello… ma nella Mia grazia.”',
+  'vessel of mercy — a story from the Diary of Saint Faustina Kowalska':
+    'vaso di misericordia — una storia dal Diario di Santa Faustina Kowalska',
+};
+
+
+/* ============ 05d-lang-pl.js ============ */
+/* Polski — jej język. Klucze to oryginalne zdania angielskie.
+   Cytaty z Dzienniczka podano w brzmieniu możliwie bliskim oryginałowi. */
+
+I18N.dict.pl = {
+  /* ---- title ---- */
+  'VESSEL OF MERCY': 'NACZYNIE MIŁOSIERDZIA',
+  'FROM THE DIARY OF SAINT FAUSTINA KOWALSKA': 'Z DZIENNICZKA ŚWIĘTEJ FAUSTYNY KOWALSKIEJ',
+  'it is the Hour of Mercy now': 'teraz jest Godzina Miłosierdzia',
+  'touch anywhere': 'dotknij gdziekolwiek',
+  'Continue': 'Kontynuuj',
+  'Begin again': 'Zacznij od nowa',
+  'from Głogowiec': 'od Głogowca',
+  'The keepsake': 'Pamiątka',
+  'return to your painting': 'wróć do swojego obrazu',
+  'Begin': 'Rozpocznij',
+  'a true story, gently told': 'prawdziwa historia, opowiedziana łagodnie',
+  'chapter': 'rozdział',
+  'Chapter': 'Rozdział',
+
+  /* ---- menu ---- */
+  'Return': 'Powrót',
+  'Restart chapter': 'Rozpocznij rozdział od nowa',
+  'sound': 'dźwięk',
+  'calm motion': 'spokojny ruch',
+  'A story drawn from the Diary of Saint Faustina Kowalska (1905–1938). Quotations cited as “Diary, n.” are from <i>Diary: Divine Mercy in My Soul</i>, © 1987 Congregation of Marians of the Immaculate Conception.':
+    'Opowieść oparta na Dzienniczku świętej Faustyny Kowalskiej (1905–1938). Cytaty oznaczone „Dzienniczek, n.” pochodzą z <i>Dzienniczka: Miłosierdzie Boże w duszy mojej</i>, © 1987 Zgromadzenie Księży Marianów Niepokalanego Poczęcia NMP.',
+  'sound off — M': 'dźwięk wyłączony — M',
+  'sound on': 'dźwięk włączony',
+
+  /* ---- chapter registry ---- */
+  'A Voice in the Night': 'Głos w Nocy',
+  'The Dance': 'Zabawa',
+  'The Doors': 'Drzwi',
+  'Small Things': 'Małe Rzeczy',
+  'Paint an Image': 'Wymaluj Obraz',
+  'The Chaplet': 'Koronka',
+  'The Gate': 'Furta',
+  'The Dark Night': 'Ciemna Noc',
+  'The Spark': 'Iskra',
+  'The Spark (epilogue)': 'Iskra (epilog)',
+  'Warsaw · 1925': 'Warszawa · 1925',
+  'The Convent · 1926–1930': 'Klasztor · 1926–1930',
+  'Płock · 22 February 1931': 'Płock · 22 lutego 1931',
+  'Vilnius · September 1935': 'Wilno · wrzesień 1935',
+  'Kraków · 1937': 'Kraków · 1937',
+  'Prądnik Sanatorium · 1938': 'Sanatorium na Prądniku · 1938',
+  'Kraków-Łagiewniki · 5 October 1938': 'Kraków-Łagiewniki · 5 października 1938',
+  '1938 — today': '1938 — dziś',
+
+  /* ---- ch1 ---- */
+  'Głogowiec, central Poland. A farmhouse with ten children and never quite enough bread.':
+    'Głogowiec, środkowa Polska. Wiejska chata z dziesięciorgiem dzieci, w której chleba nigdy nie było dość.',
+  'The third child, Helena, woke in the night. Something was calling her by name.':
+    'Trzecie dziecko, Helenka, obudziła się w nocy. Coś wołało ją po imieniu.',
+  'hold — and stay awhile': 'przytrzymaj — i pozostań chwilę',
+  'It was in the seventh year of my life that, for the first time, I heard God’s voice in my soul; that is, an invitation to a more perfect life.':
+    'W siódmym roku życia po raz pierwszy usłyszałam głos Boży w duszy, czyli zaproszenie do życia doskonalszego.',
+  'She was seven. For years she would try to outgrow it, the way one outgrows a dress.':
+    'Miała siedem lat. Przez lata próbowała z tego wyrosnąć, jak wyrasta się z sukienki.',
+  'The voice did not outgrow her.': 'Głos z niej nie wyrósł.',
+
+  /* ---- ch2 ---- */
+  'Łódź. Twelve years later.': 'Łódź. Dwanaście lat później.',
+  'Her sister begged her to come — one evening of music in Wenecja Park.':
+    'Siostra błagała, żeby przyszła — jeden wieczór muzyki w parku Wenecja.',
+  'Helena wore her one good dress.': 'Helena włożyła swoją jedyną dobrą sukienkę.',
+  'tap with the music': 'stukaj w rytm muzyki',
+  'The music kept playing. The dancers kept turning.':
+    'Muzyka grała dalej. Tańczący wirowali dalej.',
+  'But Helena saw only Him — racked with pain, stripped of His clothing, covered in wounds.':
+    'Ale Helena widziała tylko Jego — umęczonego, obnażonego z szat, okrytego ranami.',
+  'How long shall I put up with you and how long will you keep putting Me off?':
+    'Dokąd cię cierpiał będę i dokąd Mnie zwodzić będziesz?',
+  'there is nothing here — hold, and walk away': 'nie ma tu nic — przytrzymaj i odejdź',
+  'The Cathedral of Saint Stanislaus Kostka. She did not remember walking there.':
+    'Katedra świętego Stanisława Kostki. Nie pamiętała drogi, którą tam doszła.',
+  'She fell prostrate before the Blessed Sacrament and asked what He wanted of her.':
+    'Padła na twarz przed Najświętszym Sakramentem i zapytała, czego od niej chce.',
+  'hold': 'przytrzymaj',
+  'Go at once to Warsaw; you will enter a convent there.':
+    'Jedź natychmiast do Warszawy, tam wstąpisz do klasztoru.',
+  'She went home only to pack a small bag, and asked her sister to say goodbye for her.':
+    'Wróciła do domu tylko po to, by spakować małą torbę, a siostrę poprosiła o pożegnanie za nią.',
+  'She was nineteen, and she had stopped pretending.':
+    'Miała dziewiętnaście lat i przestała udawać.',
+  'THE EVENING': 'WIECZÓR',
+
+  /* ---- ch3 ---- */
+  'Warsaw. She arrived with one bag and no one waiting.':
+    'Warszawa. Przyjechała z jedną torbą i nikt na nią nie czekał.',
+  'hold to walk — knock at the doors': 'przytrzymaj, by iść — pukaj do drzwi',
+  'We have no place for you.': 'Nie mamy dla ciebie miejsca.',
+  'No dowry? Then no.': 'Bez posagu? W takim razie nie.',
+  'We do not take in maids.': 'Nie przyjmujemy służących.',
+  'There was another door.': 'Były kolejne drzwi.',
+  'And another.': 'I jeszcze jedne.',
+  'She knocked on many doors that summer. The answer learned her face.':
+    'Tamtego lata pukała do wielu drzwi. Odmowa nauczyła się jej twarzy.',
+  'One door remained — Żytnia Street: the Sisters of Our Lady of Mercy.':
+    'Pozostały jedne drzwi — ulica Żytnia: Zgromadzenie Sióstr Matki Bożej Miłosierdzia.',
+  'The superior, Mother Michael, studied the small girl in the worn dress.':
+    'Przełożona, matka Michaela, przyjrzała się drobnej dziewczynie w znoszonej sukience.',
+  '“Go and ask the Lord of the house whether He will accept you.”':
+    '„Idź i zapytaj Pana domu, czy cię przyjmie”.',
+  'hold — and ask': 'przytrzymaj — i zapytaj',
+  'I do accept; you are in My Heart.': 'Przyjmuję, jesteś w sercu Moim.',
+  'Accepted — on one condition. She must earn the clothes she would renounce.':
+    'Przyjęta — pod jednym warunkiem. Musiała zarobić na wyprawę, której miała się wyrzec.',
+  'A year in service at Ostrówek: other people’s laundry, other people’s children, coin by coin.':
+    'Rok służby w Ostrówku: cudze pranie, cudze dzieci, grosz do grosza.',
+  'On the first of August, 1925, the door on Żytnia Street opened to her.':
+    'Pierwszego sierpnia 1925 roku drzwi przy Żytniej otworzyły się przed nią.',
+  'walk in': 'wejdź',
+
+  /* ---- ch4 ---- */
+  'She received the habit, and with it a new name: Sister Maria Faustyna of the Blessed Sacrament.':
+    'Otrzymała habit, a z nim nowe imię: siostra Maria Faustyna od Najświętszego Sakramentu.',
+  'She had hoped, perhaps, for ecstasies. She was given the kitchen.':
+    'Może liczyła na ekstazy. Dostała kuchnię.',
+  'hold and move gently — hurry earns nothing': 'przytrzymaj i poruszaj łagodnie — pośpiech nic nie daje',
+  'Great love can change small things into great ones, and it is only love which lends value to our actions.':
+    'Miłość wielka umie małe rzeczy zamieniać na rzeczy wielkie i tylko miłość nadaje czynom naszym wartość.',
+  'One evening the great pot was too heavy for her strength, and she was ashamed to ask.':
+    'Pewnego wieczoru wielki kocioł był ponad jej siły, a wstydziła się prosić o pomoc.',
+  'Out of obedience, she tried again —': 'Z posłuszeństwa spróbowała raz jeszcze —',
+  '— and the lifted lid breathed out roses.': '— a uniesiona pokrywa tchnęła różami.',
+  'Nothing done for love is small. The years passed this way: Warsaw, Płock, the gardens, the gate.':
+    'Nic, co czynione z miłości, nie jest małe. Tak mijały lata: Warszawa, Płock, ogrody, furta.',
+
+  /* ---- ch5 ---- */
+  'Płock. The evening of the 22nd of February, 1931. She was alone in her cell.':
+    'Płock. Wieczór 22 lutego 1931 roku. Była sama w celi.',
+  'In the evening, when I was in my cell, I saw the Lord Jesus clothed in a white garment.':
+    'Wieczorem, kiedy byłam w celi, ujrzałam Pana Jezusa ubranego w szacie białej.',
+  'Paint an image according to the pattern you see, with the signature: Jesus, I trust in You.':
+    'Wymaluj obraz według rysunku, który widzisz, z podpisem: Jezu, ufam Tobie.',
+  'I promise that the soul that will venerate this image will not perish.':
+    'Obiecuję, że dusza, która czcić będzie ten obraz, nie zginie.',
+  'She was twenty-five — a convent cook who had never once held a brush.':
+    'Miała dwadzieścia pięć lat — klasztorna kucharka, która nigdy nie trzymała pędzla.',
+  'For three years the command followed her. Confessors shrugged. Superiors frowned.':
+    'Przez trzy lata to polecenie szło za nią. Spowiednicy wzruszali ramionami. Przełożone marszczyły brwi.',
+  'Then, in Vilnius, one priest believed her: Father Michał Sopoćko. He hired a painter, Eugeniusz Kazimirowski, and every week Sister Faustina came to correct the work.':
+    'Aż w Wilnie uwierzył jej jeden kapłan: ksiądz Michał Sopoćko. Zatrudnił malarza, Eugeniusza Kazimirowskiego, i co tydzień siostra Faustyna przychodziła poprawiać pracę.',
+  'Vilnius, 1934. The painter waits. Show him what you saw.':
+    'Wilno, 1934. Malarz czeka. Pokaż mu, co widziałaś.',
+  'paint Him — slow, broad strokes of light': 'maluj Go — powolnymi, szerokimi pociągnięciami światła',
+  'the right hand, raised in blessing': 'prawa dłoń, wzniesiona do błogosławieństwa',
+  'from the heart — draw the red ray, downward': 'od serca — poprowadź czerwony promień w dół',
+  'and the pale ray, beside it': 'a obok promień blady',
+  'sign it — trace the words, left to right': 'podpisz — przeciągnij po słowach, od lewej do prawej',
+  'The pale ray stands for the Water which makes souls righteous. The red ray stands for the Blood which is the life of souls. — Diary, 299':
+    'Blady promień oznacza wodę, która usprawiedliwia dusze; czerwony promień oznacza krew, która jest życiem dusz. — Dzienniczek, 299',
+  'It was finished. And Sister Faustina wept.': 'Był skończony. A siostra Faustyna zapłakała.',
+  '“Who will paint You as beautiful as You are?”': '„Kto Cię wymaluje tak pięknym, jakim jesteś?”',
+  'Not in the beauty of the color, nor of the brush, lies the greatness of this image, but in My grace.':
+    'Nie w piękności farby ani pędzla jest wielkość tego obrazu, ale w łasce Mojej.',
+  'Whatever your hand just made — it was enough. It was never about the brush.':
+    'Cokolwiek właśnie uczyniła twoja ręka — wystarczyło. Nigdy nie chodziło o pędzel.',
+  'In April 1935 the image was hung high in the Gate of Dawn, and a city looked up at it.':
+    'W kwietniu 1935 roku obraz zawisł wysoko w Ostrej Bramie, a miasto podniosło ku niemu oczy.',
+
+  /* ---- ch6 ---- */
+  'Vilnius. In September of 1935, she saw in the sky an angel — the executor of God’s wrath, sent to strike the earth.':
+    'Wilno. We wrześniu 1935 roku ujrzała na niebie anioła — wykonawcę gniewu Bożego, posłanego, by uderzyć w ziemię.',
+  'She began to plead for the world — and heard, rising within her, words she had never learned.':
+    'Zaczęła błagać za światem — i usłyszała, jak wznoszą się w niej słowa, których nigdy się nie uczyła.',
+  'press with the slow ring — begin': 'naciskaj z powolnym kręgiem — zacznij',
+  'Eternal Father, I offer You the Body and Blood, Soul and Divinity of Your dearly beloved Son, Our Lord Jesus Christ, in atonement for our sins and those of the whole world.':
+    'Ojcze Przedwieczny, ofiaruję Ci Ciało i Krew, Duszę i Bóstwo najmilszego Syna Twojego, a Pana naszego Jezusa Chrystusa, na przebłaganie za grzechy nasze i całego świata.',
+  'each small bead — with the ring': 'każdy mały paciorek — z kręgiem',
+  'Ten times on the small beads: For the sake of His sorrowful Passion, have mercy on us and on the whole world.':
+    'Dziesięć razy na małych paciorkach: Dla Jego bolesnej męki miej miłosierdzie dla nas i całego świata.',
+  'And again. And again — five decades, fifty pleas, on ordinary rosary beads.':
+    'I znowu. I znowu — pięć dziesiątek, pięćdziesiąt błagań, na zwykłych paciorkach różańca.',
+  'hold — and pray on': 'przytrzymaj — i módl się dalej',
+  'three times — Holy God': 'trzy razy — Święty Boże',
+  'The arm did not fall. Before those words, the angel stood helpless — and the storm knelt.':
+    'Ramię nie opadło. Wobec tych słów anioł stał bezsilny — a burza uklękła.',
+  'Whoever will recite it will receive great mercy at the hour of death.':
+    'Ktokolwiek będzie ją odmawiał, dostąpi wielkiego miłosierdzia w godzinę śmierci.',
+  'She wrote the words down. The world still prays them every day, at three o’clock, on ordinary beads.':
+    'Zapisała te słowa. Świat odmawia je do dziś, codziennie o trzeciej, na zwykłych paciorkach.',
+  'for the sake of His sorrowful Passion, have mercy on us and on the whole world':
+    'dla Jego bolesnej męki miej miłosierdzie dla nas i całego świata',
+  'Holy God…': 'Święty Boże…',
+  'Holy Mighty One…': 'Święty Mocny…',
+  'Holy Immortal One…': 'Święty Nieśmiertelny…',
+
+  /* ---- ch7 ---- */
+  'Kraków. Hard years. The convent made her portress — keeper of the gate.':
+    'Kraków. Ciężkie lata. Klasztor uczynił ją furtianką — strażniczką furty.',
+  'The poor of the city learned which gate gave soup, and the line learned her name.':
+    'Ubodzy miasta nauczyli się, która furta daje zupę, a kolejka nauczyła się jej imienia.',
+  'a mother, a child asleep on her shoulder': 'matka z dzieckiem uśpionym na ramieniu',
+  '“Bread, sister. Not for me.”': '„Chleba, siostro. Nie dla mnie”.',
+  'The loaf passed through the bars. The child did not wake — but the mother closed her eyes.':
+    'Bochenek przeszedł przez kraty. Dziecko się nie obudziło — ale matka zamknęła oczy.',
+  '“They are beautiful, your little one.” The woman looked up as if no one had spoken to her in weeks.':
+    '„Piękne jest twoje maleństwo”. Kobieta podniosła wzrok, jakby od tygodni nikt do niej nie mówił.',
+  'She prayed in silence. The woman left no lighter — but not alone.':
+    'Modliła się w milczeniu. Kobieta odeszła z tym samym ciężarem — ale nie sama.',
+  'an old man, coat thin as paper': 'stary człowiek w płaszczu cienkim jak papier',
+  '“Only to stand out of the rain a moment.”': '„Tylko chwilę postać poza deszczem”.',
+  'Bread, and the dry corner of the gateway. He ate slowly, saving half.':
+    'Chleb i suchy kąt bramy. Jadł powoli, połowę odkładając.',
+  'They spoke of the harvests before the war. For a moment he was forty years younger.':
+    'Rozmawiali o żniwach sprzed wojny. Przez chwilę był czterdzieści lat młodszy.',
+  'She held him in her prayer. He straightened a little, as if the coat had thickened.':
+    'Ogarnęła go modlitwą. Wyprostował się nieco, jakby płaszcz zgęstniał.',
+  'a young man with hard eyes': 'młody mężczyzna o twardych oczach',
+  '“God has forgotten this city. Don’t waste your bread on me.”':
+    '„Bóg zapomniał o tym mieście. Nie marnuj na mnie chleba”.',
+  'He took the loaf like an accusation. At the corner, he looked back once.':
+    'Wziął bochenek jak oskarżenie. Na rogu obejrzał się raz.',
+  '“He has not forgotten you. I know it the way I know it is raining.” He had no answer for that.':
+    '„On o tobie nie zapomniał. Wiem to tak, jak wiem, że pada”. Na to nie miał odpowiedzi.',
+  'No words would land. She prayed instead — the long way around a locked door.':
+    'Żadne słowo nie trafiało. Modliła się więc — długą drogą wokół zamkniętych drzwi.',
+  'a widow who says nothing at all': 'wdowa, która nie mówi nic',
+  'Bread, wrapped in cloth, pressed into silent hands.':
+    'Chleb, zawinięty w płótno, wciśnięty w milczące dłonie.',
+  'No answer came. Some griefs only want company; she stood with her in the rain.':
+    'Odpowiedź nie przyszła. Niektóre smutki chcą tylko towarzystwa; stała z nią w deszczu.',
+  'For the silent, silence that listens upward. The widow lifted her face into the rain like a blessing.':
+    'Dla milczących — milczenie, które słucha ku górze. Wdowa uniosła twarz ku deszczowi jak ku błogosławieństwu.',
+  'Toward evening, when the pots were nearly empty, one more figure came through the rain.':
+    'Pod wieczór, gdy garnki były już prawie puste, przez deszcz nadeszła jeszcze jedna postać.',
+  'a young man — barefoot, bareheaded, his clothes frozen to him':
+    'młodzieniec — bosy, z odkrytą głową, w odzieniu przymarzniętym do ciała',
+  '“Something hot, if you can.”': '„Coś ciepłego, jeśli można”.',
+  'There was bread in the basket still. She gave him all of it — and went to the kitchen besides, and brought him soup, full of crumbs.':
+    'W koszu wciąż był chleb. Oddała mu wszystko — a do tego poszła do kuchni i przyniosła mu zupę, pełną okruchów.',
+  'There was no bread left to weigh, no choice to make. She went to the kitchen and brought him soup, full of crumbs.':
+    'Nie było już chleba do ważenia ani wyboru do podjęcia. Poszła do kuchni i przyniosła mu zupę, pełną okruchów.',
+  'He ate. And as she took back the bowl, the rain forgot to fall.':
+    'Zjadł. A gdy odbierała miskę, deszcz zapomniał padać.',
+  'My daughter, the blessings of the poor who bless Me as they leave this gate have reached My ears. And this is why I came down from My throne — to taste the fruits of your mercy.':
+    'Córko Moja, doszły do uszu Moich błogosławieństwa ubogich, którzy odchodząc od tej furty, błogosławią Mi. I dlatego zszedłem z tronu — by skosztować owoców miłosierdzia twego.',
+  'I am giving you three ways of exercising mercy toward your neighbor: the first — by deed, the second — by word, the third — by prayer.':
+    'Podaję ci trzy sposoby czynienia miłosierdzia bliźnim: pierwszy — czyn, drugi — słowo, trzeci — modlitwa.',
+  'Help me, O Lord, that my eyes may be merciful, so that I may never suspect or judge from appearances, but look for what is beautiful in my neighbors’ souls.':
+    'Dopomóż mi, Panie, aby oczy moje były miłosierne, bym nigdy nie podejrzewała i nie sądziła według zewnętrznych pozorów, ale upatrywała to, co piękne w duszach bliźnich.',
+  'Deed': 'Czyn',
+  'Word': 'Słowo',
+  'Prayer': 'Modlitwa',
+  'give bread — {n} left': 'daj chleb — zostało: {n}',
+  'no bread left': 'nie ma już chleba',
+  'stay, and speak': 'zostań i mów',
+  'hold a moment': 'przytrzymaj chwilę',
+  'the young man': 'młodzieniec',
+
+  /* ---- ch8 ---- */
+  'The tuberculosis reached her lungs, then everything else. They sent her to the sanatorium at Prądnik.':
+    'Gruźlica zajęła płuca, potem wszystko inne. Wysłano ją do sanatorium na Prądniku.',
+  'And there, the visions stopped. The voice stopped. Heaven went dark and silent as this garden.':
+    'I tam widzenia ustały. Głos umilkł. Niebo stało się ciemne i ciche jak ten ogród.',
+  'hold —': 'przytrzymaj —',
+  '…nothing answers. keep walking.': '…nic nie odpowiada. idź dalej.',
+  'She kept a dry record of those weeks. No comfort in it — only this:':
+    'Prowadziła suchy zapis tamtych tygodni. Nie ma w nim pociechy — tylko to:',
+  'Suffering is a great grace; through suffering the soul becomes like the Savior; in suffering love becomes crystallized.':
+    'Cierpienie jest wielką łaską; przez cierpienie dusza upodabnia się do Zbawiciela; w cierpieniu krystalizuje się miłość.',
+  'As often as you hear the clock strike the third hour, immerse yourself completely in My mercy, adoring and glorifying it.':
+    'Ile razy usłyszysz, jak zegar bije trzecią godzinę, zanurzaj się cała w miłosierdziu Moim, uwielbiając i wysławiając je.',
+  'In this hour, I will refuse nothing to the soul that makes a request of Me in virtue of My Passion.':
+    'W godzinie tej nie odmówię duszy niczego, która Mnie prosi przez mękę Moją.',
+  'The flame had not answered her holding. It returned anyway — not earned. Given.':
+    'Płomień nie odpowiedział na jej trzymanie. Wrócił mimo to — nie wysłużony. Darowany.',
+  'The graces of My mercy are drawn by means of one vessel only, and that is — trust. The more a soul trusts, the more it will receive.':
+    'Łaski z Mojego miłosierdzia czerpie się jednym naczyniem, a jest nim — ufność. Im dusza więcej zaufa, tym więcej otrzyma.',
+  'where is He now?': 'gdzie On jest teraz?',
+  'you imagined all of it': 'wszystko sobie wymyśliłaś',
+  'a cook — a prophet?': 'kucharka — prorokini?',
+  'no one believes you': 'nikt ci nie wierzy',
+  'the night has no far side': 'ta noc nie ma drugiego brzegu',
+  'He has gone quiet, hasn’t He': 'zamilkł, prawda',
+
+  /* ---- ch9 ---- */
+  'Kraków-Łagiewniki. The night of the fifth of October, 1938.':
+    'Kraków-Łagiewniki. Noc piątego października 1938 roku.',
+  'She was thirty-three — the age of her Lord.':
+    'Miała trzydzieści trzy lata — wiek swojego Pana.',
+  'breathe with her — hold… and release': 'oddychaj z nią — wstrzymaj… i wypuść',
+  'The sisters knelt at the bed. The candle kept its small vigil.':
+    'Siostry uklękły przy łóżku. Świeca trwała w swoim małym czuwaniu.',
+  'You are the secretary of My mercy; I have chosen you for that office in this life and the next life.':
+    'Jesteś sekretarką Mojego miłosierdzia; wybrałem cię na ten urząd w tym i przyszłym życiu.',
+  '— let go': '— puść',
+
+  /* ---- epilogue ---- */
+  'She was buried in the convent garden at Łagiewniki.':
+    'Pochowano ją w klasztornym ogrodzie w Łagiewnikach.',
+  '1939. A year later, the darkness she had been shown swept out of the same sky.':
+    '1939. Rok później ciemność, którą jej ukazano, runęła z tego samego nieba.',
+  'But in hidden chapels, the Image was copied, and copied again.':
+    'Ale w ukrytych kaplicach Obraz kopiowano, i kopiowano znowu.',
+  '1959. Rome — misled by a faulty translation of her Diary — silenced the devotion.':
+    '1959. Rzym — wprowadzony w błąd wadliwym tłumaczeniem Dzienniczka — nakazał milczenie nabożeństwu.',
+  'The archbishop of Kraków would not let her rest in obscurity: Karol Wojtyła.':
+    'Arcybiskup Krakowa nie pozwolił jej spocząć w zapomnieniu: Karol Wojtyła.',
+  '1978. The ban was lifted. Six months later the world learned the archbishop’s new name — John Paul II.':
+    '1978. Zakaz zniesiono. Pół roku później świat poznał nowe imię arcybiskupa — Jan Paweł II.',
+  '30 April 2000. Helena Kowalska — Sister Faustina — was declared a saint: the first of the Great Jubilee.':
+    '30 kwietnia 2000. Helena Kowalska — siostra Faustyna — została ogłoszona świętą: pierwszą Wielkiego Jubileuszu.',
+  'And the Church received a new feast: the Second Sunday of Easter — Divine Mercy Sunday.':
+    'A Kościół otrzymał nowe święto: drugą niedzielę Wielkanocy — Niedzielę Miłosierdzia Bożego.',
+  'Somewhere on earth, it is always three o’clock.':
+    'Gdzieś na ziemi zawsze jest trzecia godzina.',
+  'And the image you painted in Vilnius —': 'A obraz, który wymalowałeś w Wilnie —',
+  'Jezu, ufam Tobie — Jesus, I trust in You': 'Jezu, ufam Tobie',
+  'painted by your hand · Vilnius, 1934': 'malowany twoją ręką · Wilno, 1934',
+  '— became this one, by Eugeniusz Kazimirowski · Vilnius, 1934':
+    '— stał się tym oto, pędzla Eugeniusza Kazimirowskiego · Wilno, 1934',
+  '“Not in the beauty of the color, nor of the brush… but in My grace.”':
+    '„Nie w piękności farby ani pędzla… ale w łasce Mojej”.',
+  'vessel of mercy — a story from the Diary of Saint Faustina Kowalska':
+    'naczynie miłosierdzia — opowieść z Dzienniczka świętej Faustyny Kowalskiej',
+};
 
 
 /* ============ 06-save.js ============ */
@@ -2023,7 +3046,7 @@ const Engine = {
       };
 
       if (ch && !opts.noCard) {
-        TitleCard.show(ch.num ? `Chapter ${ch.num}` : '', ch.title, ch.place);
+        TitleCard.show(ch.num ? `${tr('Chapter')} ${ch.num}` : '', ch.title, ch.place);
         this.fade.color = '#000000';
         this.fade.alpha = 1;
         const start = this.time;
@@ -2393,7 +3416,7 @@ SCENES.title = {
     const opts = [];
     if (hasSave && !Save.data.done) {
       const ch = CHAPTERS.find(c => c.id === savedId) || CHAPTERS[0];
-      opts.push({ id: 'continue', label: 'Continue', sub: `chapter ${ch.num || '—'} — ${ch.title}` });
+      opts.push({ id: 'continue', label: 'Continue', sub: `${tr('chapter')} ${ch.num || '—'} — ${tr(ch.title)}` });
       opts.push({ id: 'begin', label: 'Begin again', sub: 'from Głogowiec' });
     } else if (Save.data.done) {
       opts.push({ id: 'begin', label: 'Begin again', sub: 'from Głogowiec' });
@@ -2443,23 +3466,23 @@ SCENES.title = {
     ctx.globalAlpha = this.titleA;
     spacedText(ctx, 'FAUSTYNA', 0, 318, 74, 26, 'rgba(240,233,219,0.96)');
     ctx.globalAlpha = this.titleA * 0.85;
-    spacedText(ctx, 'VESSEL OF MERCY', 0, 388, 19, 11, 'rgba(232,201,138,0.8)');
+    spacedText(ctx, tr('VESSEL OF MERCY'), 0, 388, 19, 11, 'rgba(232,201,138,0.8)');
     ctx.globalAlpha = this.titleA * 0.6;
-    spacedText(ctx, 'FROM THE DIARY OF SAINT FAUSTINA KOWALSKA', 0, 430, 12, 5.5, 'rgba(236,229,216,0.55)');
+    spacedText(ctx, tr('FROM THE DIARY OF SAINT FAUSTINA KOWALSKA'), 0, 430, 12, 5.5, 'rgba(236,229,216,0.55)');
     const hr = new Date().getHours();
     if (hr === 15) {
       ctx.globalAlpha = this.titleA * (0.45 + 0.2 * Math.sin(t * 1.4));
       ctx.font = 'italic 15px "Iowan Old Style","Palatino Linotype",Georgia,serif';
       ctx.textAlign = 'center';
       ctx.fillStyle = 'rgba(232,201,138,0.85)';
-      ctx.fillText('it is the Hour of Mercy now', 0, 466);
+      ctx.fillText(tr('it is the Hour of Mercy now'), 0, 466);
     }
     if (!this.revealed && this.t > 2.6) {
       ctx.globalAlpha = (0.35 + 0.25 * Math.sin(t * 1.8)) * clamp01(this.t - 2.6);
       ctx.font = '15px "Iowan Old Style","Palatino Linotype",Georgia,serif';
       ctx.textAlign = 'center';
       ctx.fillStyle = '#ece5d8';
-      ctx.fillText('touch anywhere', 0, 560);
+      ctx.fillText(tr('touch anywhere'), 0, 560);
     }
     ctx.restore();
   },
@@ -2921,7 +3944,7 @@ SCENES.ch2 = {
       ctx.globalAlpha = this.comboAlpha * 0.9;
       const s = 1 + this.comboPop * 0.18;
       ctx.translate(0, 120); ctx.scale(s, s);
-      spacedText(ctx, 'THE EVENING', 0, -14, 13, 7, `rgba(232,201,138,${0.7 * this.comboAlpha})`);
+      spacedText(ctx, tr('THE EVENING'), 0, -14, 13, 7, `rgba(232,201,138,${0.7 * this.comboAlpha})`);
       spacedText(ctx, '× ' + this.combo, 0, 24, 30, 4, `rgba(240,233,219,${0.9 * this.comboAlpha})`);
       ctx.restore();
     }
@@ -4256,7 +5279,7 @@ SCENES.ch6 = {
         ctx.font = 'italic 16px "Iowan Old Style","Palatino Linotype",Georgia,serif';
         ctx.textAlign = 'center';
         ctx.fillStyle = '#d8d0c0';
-        ctx.fillText('for the sake of His sorrowful Passion, have mercy on us and on the whole world', cx, cy + 158);
+        ctx.fillText(tr('for the sake of His sorrowful Passion, have mercy on us and on the whole world'), cx, cy + 158);
         ctx.globalAlpha = 1;
       }
       if (this.phase === 'holy') {
@@ -4264,7 +5287,7 @@ SCENES.ch6 = {
         ctx.font = 'italic 16px "Iowan Old Style","Palatino Linotype",Georgia,serif';
         ctx.textAlign = 'center';
         ctx.fillStyle = '#e6dcc6';
-        ctx.fillText(['Holy God…', 'Holy Mighty One…', 'Holy Immortal One…'][Math.min(this.holyCount, 2)], cx, cy + 158);
+        ctx.fillText(tr(['Holy God…', 'Holy Mighty One…', 'Holy Immortal One…'][Math.min(this.holyCount, 2)]), cx, cy + 158);
         ctx.globalAlpha = 1;
       }
     }
@@ -4345,7 +5368,19 @@ SCENES.ch7 = {
     yield S.waitFor(() => sc.visitor && sc.visitor.state === 'waiting');
     yield S.textAuto('a young man — barefoot, bareheaded, his clothes frozen to him', 4);
     yield S.textAuto('“Something hot, if you can.”', 3.4);
-    yield S.text('There was no bread left to weigh, no choice to make. She went to the kitchen and brought him soup, full of crumbs.');
+    /* the basket may still hold loaves if the player chose word or prayer —
+       the beat must match what the player can see */
+    if (sc.bread > 0) {
+      S.do(() => {
+        const v = sc.visitor;
+        sc.loafAnim = { t: 0, from: { x: 240, y: 700 }, to: { x: v.x, y: v.y - v.def.h * 0.5 } };
+        Audio.swish(0.18);
+        Engine.after(900, () => { sc.bread = 0; Audio.pluck('G4', 0.3); });
+      });
+      yield S.text('There was bread in the basket still. She gave him all of it — and went to the kitchen besides, and brought him soup, full of crumbs.');
+    } else {
+      yield S.text('There was no bread left to weigh, no choice to make. She went to the kitchen and brought him soup, full of crumbs.');
+    }
     S.do(() => { Tweens.to(sc, { soup: 1 }, 2, { ease: Ease.inOutSine }); Audio.shimmer(0.2, 700); });
     yield S.wait(3);
     yield S.text('He ate. And as she took back the bowl, the rain forgot to fall.');
@@ -4379,7 +5414,7 @@ SCENES.ch7 = {
     const v = this.visitor;
     v.state = 'choosing';
     Choices.show([
-      { id: 'deed', label: 'Deed', sub: this.bread > 0 ? `give bread — ${this.bread} left` : 'no bread left', disabled: this.bread <= 0 },
+      { id: 'deed', label: 'Deed', sub: this.bread > 0 ? tr('give bread — {n} left').replace('{n}', this.bread) : 'no bread left', disabled: this.bread <= 0 },
       { id: 'word', label: 'Word', sub: 'stay, and speak' },
       { id: 'prayer', label: 'Prayer', sub: 'hold a moment' },
     ], id => this._choose(id));
@@ -4758,7 +5793,7 @@ SCENES.ch8 = {
     for (const w of this.whispers) {
       ctx.globalAlpha = w.a * (0.7 + 0.3 * Math.sin(w.life * 1.4));
       ctx.fillStyle = '#8b8794';
-      ctx.fillText(w.text, w.x, w.y + Math.sin(w.life * 0.8) * 8);
+      ctx.fillText(tr(w.text), w.x, w.y + Math.sin(w.life * 0.8) * 8);
     }
     ctx.restore();
 
@@ -5272,6 +6307,7 @@ SCENES.epilogue = {
 /* Boot. */
 
 Save.read();
+I18N.detect();
 UI.init();
 R.initGrain();
 Engine.init();

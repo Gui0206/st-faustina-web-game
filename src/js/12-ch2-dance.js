@@ -272,7 +272,7 @@ SCENES.ch2 = {
       ctx.globalAlpha = this.comboAlpha * 0.9;
       const s = 1 + this.comboPop * 0.18;
       ctx.translate(0, 120); ctx.scale(s, s);
-      spacedText(ctx, 'THE EVENING', 0, -14, 13, 7, `rgba(232,201,138,${0.7 * this.comboAlpha})`);
+      spacedText(ctx, tr('THE EVENING'), 0, -14, 13, 7, `rgba(232,201,138,${0.7 * this.comboAlpha})`);
       spacedText(ctx, '× ' + this.combo, 0, 24, 30, 4, `rgba(240,233,219,${0.9 * this.comboAlpha})`);
       ctx.restore();
     }

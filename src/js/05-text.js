@@ -31,9 +31,10 @@ const Text = {
            small, hold (min seconds before advance allowed) */
   show(str, opts = {}) {
     this.clear(true);
+    str = tr(str);
     const div = document.createElement('div');
     div.className = 'line' + (opts.voice ? ' voice' : opts.quote ? ' quote' : '') + (opts.small ? ' small' : '');
-    div.innerHTML = esc(str) + (opts.attr ? `<span class="attr">— ${esc(opts.attr)}</span>` : '');
+    div.innerHTML = esc(str) + (opts.attr ? `<span class="attr">— ${esc(tr(opts.attr))}</span>` : '');
     UI.els.textbox.appendChild(div);
     requestAnimationFrame(() => requestAnimationFrame(() => div.classList.add('on')));
     this.el = div;
@@ -107,7 +108,7 @@ const Hint = {
   timer: null,
   show(str, opts = {}) {
     const el = UI.els.hint;
-    el.textContent = str;
+    el.textContent = tr(str);
     el.style.top = opts.top || '62%';
     el.classList.add('on');
     clearTimeout(this.timer);
@@ -123,9 +124,9 @@ const TitleCard = {
     const el = UI.els.titlecard;
     el.innerHTML =
       (num ? `<div class="tc-num">${esc(num)}</div>` : '') +
-      `<div class="tc-title">${esc(title)}</div>` +
+      `<div class="tc-title">${esc(tr(title))}</div>` +
       `<div class="tc-rule"></div>` +
-      (place ? `<div class="tc-place">${esc(place)}</div>` : '');
+      (place ? `<div class="tc-place">${esc(tr(place))}</div>` : '');
     el.classList.add('on');
     this.visible = true;
     this.shownAt = Engine.time;
@@ -146,7 +147,7 @@ const Choices = {
     for (const o of options) {
       const b = document.createElement('button');
       b.className = 'choice' + (o.disabled ? ' disabled' : '');
-      b.innerHTML = esc(o.label) + (o.sub ? `<small>${esc(o.sub)}</small>` : '');
+      b.innerHTML = esc(tr(o.label)) + (o.sub ? `<small>${esc(tr(o.sub))}</small>` : '');
       b.addEventListener('pointerdown', e => e.stopPropagation());
       b.addEventListener('click', e => {
         e.stopPropagation();
@@ -171,21 +172,40 @@ const Menu = {
   open: false,
   build() {
     const el = UI.els.menu;
+    const langRow = I18N.LANGS.map(l =>
+      `<span class="lang${I18N.lang === l ? ' on' : ''}" data-lang="${l}">${l.toUpperCase()}</span>`).join('');
     el.innerHTML = `
       <div class="menu-panel">
         <div class="menu-title">Faustyna</div>
         <div class="menu-sep"></div>
-        <button class="menu-item" data-act="resume">Return</button>
-        <button class="menu-item" data-act="restart">Restart chapter</button>
+        <button class="menu-item" data-act="resume">${esc(tr('Return'))}</button>
+        <button class="menu-item" data-act="restart">${esc(tr('Restart chapter'))}</button>
         <div class="menu-sep"></div>
         <div id="menu-chapters"></div>
         <div class="menu-sep"></div>
-        <div class="menu-row">sound <input type="range" id="m-vol" min="0" max="100" step="1"></div>
-        <div class="menu-row"><span class="toggle" id="m-motion"><span class="box"></span> calm motion</span></div>
-        <div class="menu-note">A story drawn from the Diary of Saint Faustina Kowalska (1905–1938).
-        Quotations cited as “Diary, n.” are from <i>Diary: Divine Mercy in My Soul</i>,
-        © 1987 Congregation of Marians of the Immaculate Conception.</div>
+        <div class="menu-row">${esc(tr('sound'))} <input type="range" id="m-vol" min="0" max="100" step="1"></div>
+        <div class="menu-row"><span class="toggle" id="m-motion"><span class="box"></span> ${esc(tr('calm motion'))}</span></div>
+        <div class="menu-row" id="m-lang">${langRow}</div>
+        <div class="menu-note">${tr('A story drawn from the Diary of Saint Faustina Kowalska (1905–1938). Quotations cited as “Diary, n.” are from <i>Diary: Divine Mercy in My Soul</i>, © 1987 Congregation of Marians of the Immaculate Conception.')}</div>
       </div>`;
+    el.querySelector('#m-vol').addEventListener('input', e => {
+      Audio.init(); Audio.setVolume(e.target.value / 100);
+    });
+    el.querySelector('#m-motion').addEventListener('click', e => {
+      e.stopPropagation();
+      Save.data.settings.reduceMotion = !Save.data.settings.reduceMotion;
+      Save.write(); this.syncSettings();
+    });
+    el.querySelector('#m-lang').addEventListener('click', e => {
+      const chip = e.target.closest && e.target.closest('[data-lang]');
+      if (!chip) return;
+      e.stopPropagation();
+      I18N.set(chip.dataset.lang);
+      this.build(); this.refreshChapters(); this.syncSettings();   // re-render in the new language
+      Audio.pluck('A4', 0.2);
+    });
+    if (this._bound) return;
+    this._bound = true;
     el.addEventListener('pointerdown', e => e.stopPropagation());
     el.addEventListener('click', e => {
       const act = e.target.closest && e.target.closest('[data-act]');
@@ -195,14 +215,6 @@ const Menu = {
       if (a === 'resume') this.toggle(false);
       if (a === 'restart') { this.toggle(false); Engine.go(Engine.scene.id, { instant: false }); }
       if (a === 'chapter') { this.toggle(false); Engine.go(act.dataset.id, { instant: false }); }
-    });
-    el.querySelector('#m-vol').addEventListener('input', e => {
-      Audio.init(); Audio.setVolume(e.target.value / 100);
-    });
-    el.querySelector('#m-motion').addEventListener('click', e => {
-      e.stopPropagation();
-      Save.data.settings.reduceMotion = !Save.data.settings.reduceMotion;
-      Save.write(); this.syncSettings();
     });
   },
   syncSettings() {
@@ -217,7 +229,7 @@ const Menu = {
       const b = document.createElement('button');
       b.className = 'menu-item' + (locked ? ' locked' : '');
       b.dataset.act = 'chapter'; b.dataset.id = c.id;
-      b.innerHTML = `${c.num}. ${esc(c.menuTitle || c.title)}` + (locked ? '' : `<span class="menu-sub">${esc(c.place)}</span>`);
+      b.innerHTML = `${c.num}. ${esc(tr(c.menuTitle || c.title))}` + (locked ? '' : `<span class="menu-sub">${esc(tr(c.place))}</span>`);
       holder.appendChild(b);
     });
   },

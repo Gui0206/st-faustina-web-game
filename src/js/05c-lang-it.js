@@ -228,6 +228,8 @@ I18N.dict.it = {
   'a young man — barefoot, bareheaded, his clothes frozen to him':
     'un giovane — scalzo, a capo scoperto, con i vestiti gelati addosso',
   '“Something hot, if you can.”': '“Qualcosa di caldo, se puoi.”',
+  'There was bread in the basket still. She gave him all of it — and went to the kitchen besides, and brought him soup, full of crumbs.':
+    'C’era ancora pane nel cesto. Glielo diede tutto — e andò inoltre in cucina e gli portò una minestra, piena di briciole.',
   'There was no bread left to weigh, no choice to make. She went to the kitchen and brought him soup, full of crumbs.':
     'Non c’era più pane da pesare, nessuna scelta da fare. Andò in cucina e gli portò una minestra, piena di briciole.',
   'He ate. And as she took back the bowl, the rain forgot to fall.':

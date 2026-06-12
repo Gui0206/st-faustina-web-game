@@ -314,7 +314,7 @@ SCENES.ch6 = {
         ctx.font = 'italic 16px "Iowan Old Style","Palatino Linotype",Georgia,serif';
         ctx.textAlign = 'center';
         ctx.fillStyle = '#d8d0c0';
-        ctx.fillText('for the sake of His sorrowful Passion, have mercy on us and on the whole world', cx, cy + 158);
+        ctx.fillText(tr('for the sake of His sorrowful Passion, have mercy on us and on the whole world'), cx, cy + 158);
         ctx.globalAlpha = 1;
       }
       if (this.phase === 'holy') {
@@ -322,7 +322,7 @@ SCENES.ch6 = {
         ctx.font = 'italic 16px "Iowan Old Style","Palatino Linotype",Georgia,serif';
         ctx.textAlign = 'center';
         ctx.fillStyle = '#e6dcc6';
-        ctx.fillText(['Holy God…', 'Holy Mighty One…', 'Holy Immortal One…'][Math.min(this.holyCount, 2)], cx, cy + 158);
+        ctx.fillText(tr(['Holy God…', 'Holy Mighty One…', 'Holy Immortal One…'][Math.min(this.holyCount, 2)]), cx, cy + 158);
         ctx.globalAlpha = 1;
       }
     }

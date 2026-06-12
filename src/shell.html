@@ -60,6 +60,15 @@ body{font-family:var(--serif);color:var(--ink);-webkit-font-smoothing:antialiase
 }
 .line.small{font-size:clamp(14px,1vw + 9px,20px);color:var(--ink-dim)}
 
+/* language chips */
+#m-lang .lang{
+  display:inline-block;margin-right:14px;padding:2px 8px;cursor:pointer;
+  color:var(--ink-dim);letter-spacing:.14em;font-size:13px;
+  border:1px solid transparent;border-radius:3px;transition:color .3s ease,border-color .3s ease;
+}
+#m-lang .lang:hover{color:var(--ink)}
+#m-lang .lang.on{color:#e8c98a;border-color:rgba(232,201,138,.35)}
+
 /* advance affordance */
 #advance{
   position:absolute;left:50%;bottom:max(4.2vh, env(safe-area-inset-bottom,0px) + 4.2vh);transform:translateX(-50%);

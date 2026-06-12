@@ -229,6 +229,8 @@ I18N.dict.pl = {
   'a young man — barefoot, bareheaded, his clothes frozen to him':
     'młodzieniec — bosy, z odkrytą głową, w odzieniu przymarzniętym do ciała',
   '“Something hot, if you can.”': '„Coś ciepłego, jeśli można”.',
+  'There was bread in the basket still. She gave him all of it — and went to the kitchen besides, and brought him soup, full of crumbs.':
+    'W koszu wciąż był chleb. Oddała mu wszystko — a do tego poszła do kuchni i przyniosła mu zupę, pełną okruchów.',
   'There was no bread left to weigh, no choice to make. She went to the kitchen and brought him soup, full of crumbs.':
     'Nie było już chleba do ważenia ani wyboru do podjęcia. Poszła do kuchni i przyniosła mu zupę, pełną okruchów.',
   'He ate. And as she took back the bowl, the rain forgot to fall.':

@@ -177,7 +177,7 @@ SCENES.ch8 = {
     for (const w of this.whispers) {
       ctx.globalAlpha = w.a * (0.7 + 0.3 * Math.sin(w.life * 1.4));
       ctx.fillStyle = '#8b8794';
-      ctx.fillText(w.text, w.x, w.y + Math.sin(w.life * 0.8) * 8);
+      ctx.fillText(tr(w.text), w.x, w.y + Math.sin(w.life * 0.8) * 8);
     }
     ctx.restore();
 

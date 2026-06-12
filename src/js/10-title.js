@@ -32,7 +32,7 @@ SCENES.title = {
     const opts = [];
     if (hasSave && !Save.data.done) {
       const ch = CHAPTERS.find(c => c.id === savedId) || CHAPTERS[0];
-      opts.push({ id: 'continue', label: 'Continue', sub: `chapter ${ch.num || '—'} — ${ch.title}` });
+      opts.push({ id: 'continue', label: 'Continue', sub: `${tr('chapter')} ${ch.num || '—'} — ${tr(ch.title)}` });
       opts.push({ id: 'begin', label: 'Begin again', sub: 'from Głogowiec' });
     } else if (Save.data.done) {
       opts.push({ id: 'begin', label: 'Begin again', sub: 'from Głogowiec' });
@@ -82,23 +82,23 @@ SCENES.title = {
     ctx.globalAlpha = this.titleA;
     spacedText(ctx, 'FAUSTYNA', 0, 318, 74, 26, 'rgba(240,233,219,0.96)');
     ctx.globalAlpha = this.titleA * 0.85;
-    spacedText(ctx, 'VESSEL OF MERCY', 0, 388, 19, 11, 'rgba(232,201,138,0.8)');
+    spacedText(ctx, tr('VESSEL OF MERCY'), 0, 388, 19, 11, 'rgba(232,201,138,0.8)');
     ctx.globalAlpha = this.titleA * 0.6;
-    spacedText(ctx, 'FROM THE DIARY OF SAINT FAUSTINA KOWALSKA', 0, 430, 12, 5.5, 'rgba(236,229,216,0.55)');
+    spacedText(ctx, tr('FROM THE DIARY OF SAINT FAUSTINA KOWALSKA'), 0, 430, 12, 5.5, 'rgba(236,229,216,0.55)');
     const hr = new Date().getHours();
     if (hr === 15) {
       ctx.globalAlpha = this.titleA * (0.45 + 0.2 * Math.sin(t * 1.4));
       ctx.font = 'italic 15px "Iowan Old Style","Palatino Linotype",Georgia,serif';
       ctx.textAlign = 'center';
       ctx.fillStyle = 'rgba(232,201,138,0.85)';
-      ctx.fillText('it is the Hour of Mercy now', 0, 466);
+      ctx.fillText(tr('it is the Hour of Mercy now'), 0, 466);
     }
     if (!this.revealed && this.t > 2.6) {
       ctx.globalAlpha = (0.35 + 0.25 * Math.sin(t * 1.8)) * clamp01(this.t - 2.6);
       ctx.font = '15px "Iowan Old Style","Palatino Linotype",Georgia,serif';
       ctx.textAlign = 'center';
       ctx.fillStyle = '#ece5d8';
-      ctx.fillText('touch anywhere', 0, 560);
+      ctx.fillText(tr('touch anywhere'), 0, 560);
     }
     ctx.restore();
   },
