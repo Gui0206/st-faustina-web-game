@@ -115,25 +115,20 @@ SCENES.epilogue = {
     const holder = UI.els.keepsake;
     holder.innerHTML = `
       <div id="ksframe"><canvas width="660" height="880"></canvas></div>
-      <div class="ks-caption">Jezu, ufam Tobie — Jesus, I trust in You
-        <small>painted by your hand · Vilnius, 1934</small></div>
+      <div class="ks-caption">${tr('Jezu, ufam Tobie — Jesus, I trust in You')}
+        <small id="ks-sub">${tr('painted by your hand · Vilnius, 1934')}</small></div>
       <div style="display:flex;gap:14px">
-        <button class="ks-btn" id="ks-save">Keep this image</button>
-        <button class="ks-btn" id="ks-title">Return</button>
+        <button class="ks-btn" id="ks-title">${tr('Return')}</button>
       </div>`;
-    const cv = holder.querySelector('canvas');
-    this._renderKeepsake(cv);
-    holder.querySelector('#ks-save').addEventListener('click', e => {
-      e.stopPropagation();
-      const big = document.createElement('canvas');
-      big.width = 900; big.height = 1200;
-      this._renderKeepsake(big, true);
-      const a = document.createElement('a');
-      a.download = 'jezu-ufam-tobie.png';
-      a.href = big.toDataURL('image/png');
-      a.click();
-      Audio.celesta('D5', 0.4);
-    });
+    this.ksCanvas = holder.querySelector('canvas');
+    this.ksFade = 0;            // 0 player's painting → 1 the real image
+    this.ksT = 0;
+    this.ksCaptioned = false;
+    this.mercy = new Image();
+    this.mercyReady = false;
+    this.mercy.onload = () => { this.mercyReady = true; };
+    this.mercy.src = MERCY_IMG;
+    this._renderKeepsake(this.ksCanvas, 0);
     holder.querySelector('#ks-title').addEventListener('click', e => {
       e.stopPropagation();
       Engine.go('title');
@@ -146,41 +141,66 @@ SCENES.epilogue = {
     Audio.motif({ final: true, vel: 0.36, slow: true });
   },
 
-  _renderKeepsake(cv, full = false) {
+  _renderKeepsake(cv, fade = 0) {
     const g = cv.getContext('2d');
     const w = cv.width, h = cv.height;
     const grd = g.createLinearGradient(0, 0, 0, h);
     grd.addColorStop(0, '#100d18'); grd.addColorStop(1, '#0a0810');
     g.fillStyle = grd; g.fillRect(0, 0, w, h);
-    /* soft halo behind */
-    const rad = g.createRadialGradient(w / 2, h * 0.42, 10, w / 2, h * 0.42, w * 0.7);
-    rad.addColorStop(0, 'rgba(255,238,200,0.16)');
+    /* soft halo behind — swells as the real image arrives */
+    const rad = g.createRadialGradient(w / 2, h * 0.42, 10, w / 2, h * 0.42, w * (0.7 + fade * 0.2));
+    rad.addColorStop(0, `rgba(255,238,200,${0.16 + fade * 0.1})`);
     rad.addColorStop(1, 'rgba(255,238,200,0)');
     g.fillStyle = rad; g.fillRect(0, 0, w, h);
-    /* the player's painting */
-    const pw = w * 0.78, ph = h * 0.78;
-    Painting.render(g, (w - pw) / 2, h * 0.06, pw, ph, { glow: 1.15 });
+    const pw = w * 0.78, ph = h * 0.78, px = (w - pw) / 2, py = h * 0.06;
+    /* the player's painting, letting go */
+    if (fade < 1) {
+      g.save();
+      g.globalAlpha = 1 - fade;
+      Painting.render(g, px, py, pw, ph, { glow: 1.15 * (1 - fade * 0.6) });
+      g.restore();
+    }
+    /* the real image — Kazimirowski's original, contained in the same frame */
+    if (fade > 0 && this.mercyReady) {
+      const iw = this.mercy.width, ih = this.mercy.height;
+      const s = Math.min(pw / iw, ph / ih);
+      const dw = iw * s, dh = ih * s;
+      g.save();
+      g.globalAlpha = fade;
+      g.drawImage(this.mercy, px + (pw - dw) / 2, py + (ph - dh) / 2, dw, dh);
+      g.restore();
+    }
     /* caption */
     g.textAlign = 'center';
     g.fillStyle = 'rgba(232,201,138,0.85)';
     g.font = `${Math.round(w * 0.026)}px Georgia,serif`;
-    const cap1 = 'F A U S T Y N A';
-    g.fillText(cap1, w / 2, h * 0.915);
+    g.fillText('F A U S T Y N A', w / 2, h * 0.915);
     g.fillStyle = 'rgba(236,229,216,0.6)';
     g.font = `italic ${Math.round(w * 0.022)}px Georgia,serif`;
-    g.fillText('“Not in the beauty of the color, nor of the brush… but in My grace.”', w / 2, h * 0.95);
+    g.fillText(tr('“Not in the beauty of the color, nor of the brush… but in My grace.”'), w / 2, h * 0.95);
     g.fillStyle = 'rgba(236,229,216,0.4)';
     g.font = `${Math.round(w * 0.017)}px Georgia,serif`;
-    g.fillText('Diary, 313', w / 2, h * 0.975);
-    if (full) {
-      g.fillStyle = 'rgba(236,229,216,0.35)';
-      g.fillText('vessel of mercy — a story from the Diary of Saint Faustina Kowalska', w / 2, h * 0.995 - 6);
-    }
+    g.fillText(tr('Diary, 313'), w / 2, h * 0.975);
   },
 
   onPress() {},
   update(dt) {
     this.t += dt;
+    /* the keepsake transfiguration: her hand's work resolves into the real canvas */
+    if (this.keepsakeShown && this.ksCanvas) {
+      this.ksT += dt;
+      if (this.ksT > 2.2 && this.mercyReady && this.ksFade < 1) {
+        if (this.ksFade === 0) { Audio.shimmer(0.5, 800); Audio.bell('D4', 0.28, 1.8); }
+        this.ksFade = Math.min(1, this.ksFade + dt / 4.5);
+        this._renderKeepsake(this.ksCanvas, Ease.inOutSine(this.ksFade));
+        if (this.ksFade >= 1 && !this.ksCaptioned) {
+          this.ksCaptioned = true;
+          const sub = UI.els.keepsake.querySelector('#ks-sub');
+          if (sub) sub.textContent = tr('— became this one, by Eugeniusz Kazimirowski · Vilnius, 1934');
+          Audio.celesta('D5', 0.35);
+        }
+      }
+    }
     for (const L of this.lights) {
       const target = (L.main ? 1 : (L.b || 0.5)) * (1 - this.dimAll * (L.main ? 0.55 : 1)) * this.lightTarget;
       L.a = damp(L.a, target, 0.9, dt);

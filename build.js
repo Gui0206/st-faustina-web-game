@@ -11,7 +11,11 @@ const JS = path.join(SRC, 'js');
 const shell = fs.readFileSync(path.join(SRC, 'shell.html'), 'utf8');
 const files = fs.readdirSync(JS).filter(f => f.endsWith('.js')).sort();
 
+/* inline assets as data URIs so index.html stays a single file */
+const mercyB64 = fs.readFileSync(path.join(SRC, 'assets', 'mercy.jpg')).toString('base64');
+
 let bundle = '"use strict";\n';
+bundle += `const MERCY_IMG = 'data:image/jpeg;base64,${mercyB64}';\n`;
 for (const f of files) {
   const code = fs.readFileSync(path.join(JS, f), 'utf8');
   bundle += `\n/* ============ ${f} ============ */\n` + code + '\n';
