@@ -6283,17 +6283,22 @@ SCENES.epilogue = {
       const half = Math.sqrt(Math.max(R0 * R0 - (yy - cy) * (yy - cy), 0));
       ctx.beginPath(); ctx.moveTo(cx - half, yy); ctx.lineTo(cx + half, yy); ctx.stroke();
     }
-    /* war shadow: a dark tide crossing the globe */
+    /* war shadow: a dark tide crossing the globe — at full sweep the whole
+       earth goes black, leaving only the lights drawn after it */
     if (this.warShadow > 0.01) {
       ctx.save();
       ctx.beginPath(); ctx.arc(cx, cy, R0, 0, TAU); ctx.clip();
-      ctx.globalAlpha = this.warShadow * 0.75;
-      const wg = ctx.createLinearGradient(cx - R0, 0, cx + R0 * 0.7, 0);
-      wg.addColorStop(0, 'rgba(40,8,12,0.9)');
-      wg.addColorStop(0.7, 'rgba(28,6,10,0.75)');
+      const trail = 200;
+      const front = cx - R0 + (R0 * 2 + trail + 60) * this.warShadow;
+      ctx.globalAlpha = Math.min(1, this.warShadow * 3) * 0.94;
+      ctx.fillStyle = 'rgba(16,3,7,1)';
+      if (front - trail > cx - R0) ctx.fillRect(cx - R0, cy - R0, (front - trail) - (cx - R0), R0 * 2);
+      const wg = ctx.createLinearGradient(front - trail, 0, front, 0);
+      wg.addColorStop(0, 'rgba(16,3,7,1)');
+      wg.addColorStop(0.5, 'rgba(34,7,11,0.8)');
       wg.addColorStop(1, 'rgba(20,4,8,0)');
       ctx.fillStyle = wg;
-      ctx.fillRect(cx - R0, cy - R0, R0 * 2 * this.warShadow + 60, R0 * 2);
+      ctx.fillRect(front - trail, cy - R0, trail, R0 * 2);
       ctx.restore();
     }
     /* the lights */
