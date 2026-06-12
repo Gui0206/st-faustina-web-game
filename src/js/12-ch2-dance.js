@@ -47,7 +47,7 @@ SCENES.ch2 = {
     yield S.textAuto('Her sister begged her to come — one evening of music in Wenecja Park.', 4.5);
     yield S.textAuto('Helena wore her one good dress.', 3.8);
     S.do(() => Hint.show('tap with the music', { ttl: 5 }));
-    yield S.waitFor(() => sc.combo >= 18);
+    yield S.waitFor(() => sc.combo >= 18, { hint: 'tap with the music', hintAfter: 6 });
     /* ---- the vision ---- */
     S.do(() => sc._beginVision());
     yield S.wait(3.4);
@@ -57,14 +57,13 @@ SCENES.ch2 = {
     S.do(() => sc._burnScore());
     yield S.wait(2.6);
     S.do(() => { sc.state = 'after'; Hint.show('there is nothing here — hold, and walk away', { ttl: 6 }); });
-    yield S.waitFor(() => sc.walker.x > View.right - 140);
+    yield S.waitFor(() => sc.walker.x > View.right - 140, { hint: 'there is nothing here — hold, and walk away', hintAfter: 6 });
     /* ---- the cathedral ---- */
     S.do(() => sc._toCathedral());
     yield S.wait(2.8);
     yield S.textAuto('The Cathedral of Saint Stanislaus Kostka. She did not remember walking there.', 4.6);
     yield S.text('She fell prostrate before the Blessed Sacrament and asked what He wanted of her.');
-    yield S.holdTotal(2.6, { hint: 'hold', hintAfter: 4 });
-    yield S.waitFor(() => sc.cath.bloom.v > 0.95);
+    yield S.waitFor(() => sc.cath.bloom.v > 0.95, { hint: 'hold', hintAfter: 4 });
     yield S.wait(1.4);
     yield S.text('Go at once to Warsaw; you will enter a convent there.', { voice: true, attr: 'Diary, 10' });
     yield S.text('She went home only to pack a small bag, and asked her sister to say goodbye for her.');

@@ -30,13 +30,13 @@ SCENES.ch9 = {
     yield S.textAuto('Kraków-Łagiewniki. The night of the fifth of October, 1938.', 4.6);
     yield S.textAuto('She was thirty-three — the age of her Lord.', 4.2);
     S.do(() => Hint.show('breathe with her — hold… and release', { ttl: 6 }));
-    yield S.waitFor(() => sc.cycle >= 1);
+    yield S.waitFor(() => sc.cycle >= 1, { hint: 'breathe with her — hold… and release', hintAfter: 7 });
     yield S.textAuto('The sisters knelt at the bed. The candle kept its small vigil.', 4.6);
-    yield S.waitFor(() => sc.cycle >= 2);
+    yield S.waitFor(() => sc.cycle >= 2, { hint: 'breathe with her — hold… and release', hintAfter: 8 });
     yield S.textAuto('You are the secretary of My mercy; I have chosen you for that office in this life and the next life.', 6, { voice: true, attr: 'Diary, 1605' });
-    yield S.waitFor(() => sc.cycle >= sc.cyclesNeeded);
+    yield S.waitFor(() => sc.cycle >= sc.cyclesNeeded, { hint: 'breathe with her — hold… and release', hintAfter: 8 });
     S.do(() => { sc.phase = 'finalhold'; Hint.show('hold', { ttl: 4 }); });
-    yield S.waitFor(() => sc.released);
+    yield S.waitFor(() => sc.released, { hint: 'hold', hintAfter: 6 });
     /* the passage */
     yield S.wait(2.4);                                  // held black silence
     S.do(() => sc._light());

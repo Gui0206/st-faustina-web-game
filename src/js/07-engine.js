@@ -217,7 +217,22 @@ class ScriptRunner {
 function makeScriptAPI() {
   return {
     wait(sec) { let t = sec; return { done: dt => (t -= dt) <= 0 }; },
-    waitFor(fn) { return { done: () => !!fn() }; },
+    waitFor(fn, opts = {}) {
+      /* opts.hint: (re-)shown whenever the player has idled hintAfter seconds
+         without satisfying the gate — an open-ended wait must never go mute,
+         or a missed one-shot hint reads as a frozen game */
+      let idle = 0, hinted = false;
+      return {
+        done: dt => {
+          if (fn()) { if (hinted) Hint.hide(); return true; }
+          if (!opts.hint) return false;
+          if (Input.down) { idle = 0; if (hinted) { Hint.hide(); hinted = false; } }
+          else idle += dt;
+          if (idle > (opts.hintAfter || 4) && !hinted) { Hint.show(opts.hint, opts); hinted = true; }
+          return false;
+        },
+      };
+    },
     text(str, opts) { return Text.show(str, opts); },
     textAuto(str, sec, opts = {}) { return Text.show(str, Object.assign({ auto: sec, passthrough: true }, opts)); },
     do(fn) {

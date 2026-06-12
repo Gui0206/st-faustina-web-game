@@ -37,17 +37,17 @@ SCENES.ch6 = {
     yield S.text('Vilnius. In September of 1935, she saw in the sky an angel — the executor of God’s wrath, sent to strike the earth.');
     yield S.text('She began to plead for the world — and heard, rising within her, words she had never learned.');
     S.do(() => { sc.phase = 'bigbead'; Hint.show('press with the slow ring — begin', { ttl: 7 }); });
-    yield S.waitFor(() => sc.phase === 'decade' );
+    yield S.waitFor(() => sc.phase === 'decade', { hint: 'press with the slow ring — begin', hintAfter: 8 });
     yield S.textAuto('Eternal Father, I offer You the Body and Blood, Soul and Divinity of Your dearly beloved Son, Our Lord Jesus Christ, in atonement for our sins and those of the whole world.', 8, { voice: true, attr: 'Diary, 476' });
-    yield S.waitFor(() => sc.decadeBeads >= 10);
+    yield S.waitFor(() => sc.decadeBeads >= 10, { hint: 'each small bead — with the ring', hintAfter: 7 });
     S.do(() => { sc.phase = 'bridge'; sc.decadesDone = 1; });
     yield S.wait(1.2);
     yield S.text('Ten times on the small beads: For the sake of His sorrowful Passion, have mercy on us and on the whole world.', { quote: true, attr: 'Diary, 476' });
     yield S.text('And again. And again — five decades, fifty pleas, on ordinary rosary beads.');
     S.do(() => { sc.phase = 'cascade'; Hint.show('hold — and pray on', { ttl: 6 }); });
-    yield S.waitFor(() => sc.cascade >= 24);
+    yield S.waitFor(() => sc.cascade >= 24, { hint: 'hold — and pray on', hintAfter: 6 });
     S.do(() => { sc.phase = 'holy'; sc.decadesDone = 5; Hint.show('three times — Holy God', { ttl: 6 }); });
-    yield S.waitFor(() => sc.holyCount >= 3);
+    yield S.waitFor(() => sc.holyCount >= 3, { hint: 'three times — Holy God', hintAfter: 6 });
     S.do(() => {
       sc.phase = 'dawn';
       Tweens.to(sc, { dawn: 1, storm: 0 }, 7, { ease: Ease.inOutSine });

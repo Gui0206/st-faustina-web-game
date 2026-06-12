@@ -36,12 +36,9 @@ SCENES.ch1 = {
     yield S.wait(2.4);
     yield S.text('Głogowiec, central Poland. A farmhouse with ten children and never quite enough bread.');
     yield S.text('The third child, Helena, woke in the night. Something was calling her by name.');
-    yield S.holdTotal(3.4, {
-      hint: 'hold — and stay awhile',
-      hintAfter: 2.5,
-      onProgress: () => {},
-    });
-    yield S.waitFor(() => sc.bloomed);
+    /* one gate, not two: the candle blooming full IS the goal, and the hint
+       comes back whenever the player lets go and waits */
+    yield S.waitFor(() => sc.bloomed, { hint: 'hold — and stay awhile', hintAfter: 2.5 });
     yield S.wait(2.2);
     yield S.text('It was in the seventh year of my life that, for the first time, I heard God’s voice in my soul; that is, an invitation to a more perfect life.', { quote: true, attr: 'Diary, 7' });
     yield S.text('She was seven. For years she would try to outgrow it, the way one outgrows a dress.');

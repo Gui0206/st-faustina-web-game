@@ -130,7 +130,7 @@ SCENES.ch7 = {
       Tweens.to(v, { lift: 1, warmth: 0.7 }, 2.4, { ease: Ease.inOutSine });
       Engine.after(1800, () => { v.state = 'resolved'; });
     } else {
-      Hint.show('hold', { ttl: 4 });
+      Hint.show('hold');   // persists until the prayer is answered — onFull hides it
       v.state = 'praying';
       this.prayHold = new PrayBloom({
         riseTime: 1.6, fall: 0.3,

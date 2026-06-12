@@ -30,7 +30,7 @@ SCENES.ch4 = {
     yield S.text('She received the habit, and with it a new name: Sister Maria Faustyna of the Blessed Sacrament.');
     yield S.text('She had hoped, perhaps, for ecstasies. She was given the kitchen.');
     S.do(() => Hint.show('hold and move gently — hurry earns nothing', { ttl: 7 }));
-    yield S.waitFor(() => sc.stations.every(s => s.bloom >= 1));
+    yield S.waitFor(() => sc.stations.every(s => s.bloom >= 1), { hint: 'hold and move gently — hurry earns nothing', hintAfter: 8 });
     S.do(() => { sc.allDone = true; });
     yield S.wait(2);
     yield S.text('Great love can change small things into great ones, and it is only love which lends value to our actions.', { quote: true, attr: 'Diary, 303' });

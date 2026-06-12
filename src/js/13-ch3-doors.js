@@ -35,19 +35,19 @@ SCENES.ch3 = {
     yield S.wait(2.2);
     yield S.textAuto('Warsaw. She arrived with one bag and no one waiting.', 4.4);
     S.do(() => Hint.show('hold to walk — knock at the doors', { ttl: 6 }));
-    yield S.waitFor(() => sc.doors[0].done);
+    yield S.waitFor(() => sc.doors[0].done, { hint: 'hold to walk — knock at the doors', hintAfter: 7 });
     yield S.textAuto('There was another door.', 3.2);
-    yield S.waitFor(() => sc.doors[1].done);
+    yield S.waitFor(() => sc.doors[1].done, { hint: 'hold to walk — knock at the doors', hintAfter: 8 });
     yield S.textAuto('And another.', 2.8);
-    yield S.waitFor(() => sc.doors[2].done);
+    yield S.waitFor(() => sc.doors[2].done, { hint: 'hold to walk — knock at the doors', hintAfter: 8 });
     yield S.text('She knocked on many doors that summer. The answer learned her face.');
     yield S.textAuto('One door remained — Żytnia Street: the Sisters of Our Lady of Mercy.', 5);
-    yield S.waitFor(() => sc.doors[3].asked);
+    yield S.waitFor(() => sc.doors[3].asked, { hint: 'hold to walk — knock at the doors', hintAfter: 8 });
     yield S.wait(1.6);
     yield S.text('The superior, Mother Michael, studied the small girl in the worn dress.');
     yield S.text('“Go and ask the Lord of the house whether He will accept you.”');
     S.do(() => { sc.kneeling = true; Hint.show('hold — and ask', { ttl: 5 }); });
-    yield S.waitFor(() => sc.bloom.v > 0.95);
+    yield S.waitFor(() => sc.bloom.v > 0.95, { hint: 'hold — and ask', hintAfter: 5 });
     yield S.wait(1.2);
     S.do(() => {
       Audio.shimmer(0.5); Audio.bell('F4', 0.3);
@@ -63,7 +63,7 @@ SCENES.ch3 = {
     });
     yield S.text('On the first of August, 1925, the door on Żytnia Street opened to her.');
     S.do(() => Hint.show('walk in', { ttl: 4 }));
-    yield S.waitFor(() => sc.hero.x > sc.doors[3].x - 16);
+    yield S.waitFor(() => sc.hero.x > sc.doors[3].x - 16, { hint: 'walk in', hintAfter: 6 });
     S.do(() => {
       Engine.fade.color = '#fff7e8';
       Tweens.to(Engine.fade, { alpha: 1 }, 1.8, { key: 'fade', ease: Ease.inOutQuad, onDone: () => Engine.nextChapter() });

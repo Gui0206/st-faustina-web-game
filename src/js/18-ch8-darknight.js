@@ -41,11 +41,11 @@ SCENES.ch8 = {
     S.do(() => Hint.show('hold —', { ttl: 3.4 }));
     yield S.wait(4);
     S.do(() => Hint.show('…nothing answers. keep walking.', { ttl: 5 }));
-    yield S.waitFor(() => sc.hero.x > sc.worldEnd * 0.5);
+    yield S.waitFor(() => sc.hero.x > sc.worldEnd * 0.5, { hint: '…nothing answers. keep walking.', hintAfter: 8 });
     S.do(() => { sc.benchSaid = true; });
     yield S.text('She kept a dry record of those weeks. No comfort in it — only this:');
     yield S.text('Suffering is a great grace; through suffering the soul becomes like the Savior; in suffering love becomes crystallized.', { quote: true, attr: 'Diary, 57' });
-    yield S.waitFor(() => sc.hero.x > sc.worldEnd * 0.96);
+    yield S.waitFor(() => sc.hero.x > sc.worldEnd * 0.96, { hint: '…nothing answers. keep walking.', hintAfter: 8 });
     /* the bell */
     S.do(() => sc._bells());
     yield S.wait(6.4);

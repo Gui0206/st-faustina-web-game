@@ -3120,7 +3120,22 @@ class ScriptRunner {
 function makeScriptAPI() {
   return {
     wait(sec) { let t = sec; return { done: dt => (t -= dt) <= 0 }; },
-    waitFor(fn) { return { done: () => !!fn() }; },
+    waitFor(fn, opts = {}) {
+      /* opts.hint: (re-)shown whenever the player has idled hintAfter seconds
+         without satisfying the gate — an open-ended wait must never go mute,
+         or a missed one-shot hint reads as a frozen game */
+      let idle = 0, hinted = false;
+      return {
+        done: dt => {
+          if (fn()) { if (hinted) Hint.hide(); return true; }
+          if (!opts.hint) return false;
+          if (Input.down) { idle = 0; if (hinted) { Hint.hide(); hinted = false; } }
+          else idle += dt;
+          if (idle > (opts.hintAfter || 4) && !hinted) { Hint.show(opts.hint, opts); hinted = true; }
+          return false;
+        },
+      };
+    },
     text(str, opts) { return Text.show(str, opts); },
     textAuto(str, sec, opts = {}) { return Text.show(str, Object.assign({ auto: sec, passthrough: true }, opts)); },
     do(fn) {
@@ -3546,12 +3561,9 @@ SCENES.ch1 = {
     yield S.wait(2.4);
     yield S.text('Głogowiec, central Poland. A farmhouse with ten children and never quite enough bread.');
     yield S.text('The third child, Helena, woke in the night. Something was calling her by name.');
-    yield S.holdTotal(3.4, {
-      hint: 'hold — and stay awhile',
-      hintAfter: 2.5,
-      onProgress: () => {},
-    });
-    yield S.waitFor(() => sc.bloomed);
+    /* one gate, not two: the candle blooming full IS the goal, and the hint
+       comes back whenever the player lets go and waits */
+    yield S.waitFor(() => sc.bloomed, { hint: 'hold — and stay awhile', hintAfter: 2.5 });
     yield S.wait(2.2);
     yield S.text('It was in the seventh year of my life that, for the first time, I heard God’s voice in my soul; that is, an invitation to a more perfect life.', { quote: true, attr: 'Diary, 7' });
     yield S.text('She was seven. For years she would try to outgrow it, the way one outgrows a dress.');
@@ -3720,7 +3732,7 @@ SCENES.ch2 = {
     yield S.textAuto('Her sister begged her to come — one evening of music in Wenecja Park.', 4.5);
     yield S.textAuto('Helena wore her one good dress.', 3.8);
     S.do(() => Hint.show('tap with the music', { ttl: 5 }));
-    yield S.waitFor(() => sc.combo >= 18);
+    yield S.waitFor(() => sc.combo >= 18, { hint: 'tap with the music', hintAfter: 6 });
     /* ---- the vision ---- */
     S.do(() => sc._beginVision());
     yield S.wait(3.4);
@@ -3730,14 +3742,13 @@ SCENES.ch2 = {
     S.do(() => sc._burnScore());
     yield S.wait(2.6);
     S.do(() => { sc.state = 'after'; Hint.show('there is nothing here — hold, and walk away', { ttl: 6 }); });
-    yield S.waitFor(() => sc.walker.x > View.right - 140);
+    yield S.waitFor(() => sc.walker.x > View.right - 140, { hint: 'there is nothing here — hold, and walk away', hintAfter: 6 });
     /* ---- the cathedral ---- */
     S.do(() => sc._toCathedral());
     yield S.wait(2.8);
     yield S.textAuto('The Cathedral of Saint Stanislaus Kostka. She did not remember walking there.', 4.6);
     yield S.text('She fell prostrate before the Blessed Sacrament and asked what He wanted of her.');
-    yield S.holdTotal(2.6, { hint: 'hold', hintAfter: 4 });
-    yield S.waitFor(() => sc.cath.bloom.v > 0.95);
+    yield S.waitFor(() => sc.cath.bloom.v > 0.95, { hint: 'hold', hintAfter: 4 });
     yield S.wait(1.4);
     yield S.text('Go at once to Warsaw; you will enter a convent there.', { voice: true, attr: 'Diary, 10' });
     yield S.text('She went home only to pack a small bag, and asked her sister to say goodbye for her.');
@@ -4053,19 +4064,19 @@ SCENES.ch3 = {
     yield S.wait(2.2);
     yield S.textAuto('Warsaw. She arrived with one bag and no one waiting.', 4.4);
     S.do(() => Hint.show('hold to walk — knock at the doors', { ttl: 6 }));
-    yield S.waitFor(() => sc.doors[0].done);
+    yield S.waitFor(() => sc.doors[0].done, { hint: 'hold to walk — knock at the doors', hintAfter: 7 });
     yield S.textAuto('There was another door.', 3.2);
-    yield S.waitFor(() => sc.doors[1].done);
+    yield S.waitFor(() => sc.doors[1].done, { hint: 'hold to walk — knock at the doors', hintAfter: 8 });
     yield S.textAuto('And another.', 2.8);
-    yield S.waitFor(() => sc.doors[2].done);
+    yield S.waitFor(() => sc.doors[2].done, { hint: 'hold to walk — knock at the doors', hintAfter: 8 });
     yield S.text('She knocked on many doors that summer. The answer learned her face.');
     yield S.textAuto('One door remained — Żytnia Street: the Sisters of Our Lady of Mercy.', 5);
-    yield S.waitFor(() => sc.doors[3].asked);
+    yield S.waitFor(() => sc.doors[3].asked, { hint: 'hold to walk — knock at the doors', hintAfter: 8 });
     yield S.wait(1.6);
     yield S.text('The superior, Mother Michael, studied the small girl in the worn dress.');
     yield S.text('“Go and ask the Lord of the house whether He will accept you.”');
     S.do(() => { sc.kneeling = true; Hint.show('hold — and ask', { ttl: 5 }); });
-    yield S.waitFor(() => sc.bloom.v > 0.95);
+    yield S.waitFor(() => sc.bloom.v > 0.95, { hint: 'hold — and ask', hintAfter: 5 });
     yield S.wait(1.2);
     S.do(() => {
       Audio.shimmer(0.5); Audio.bell('F4', 0.3);
@@ -4081,7 +4092,7 @@ SCENES.ch3 = {
     });
     yield S.text('On the first of August, 1925, the door on Żytnia Street opened to her.');
     S.do(() => Hint.show('walk in', { ttl: 4 }));
-    yield S.waitFor(() => sc.hero.x > sc.doors[3].x - 16);
+    yield S.waitFor(() => sc.hero.x > sc.doors[3].x - 16, { hint: 'walk in', hintAfter: 6 });
     S.do(() => {
       Engine.fade.color = '#fff7e8';
       Tweens.to(Engine.fade, { alpha: 1 }, 1.8, { key: 'fade', ease: Ease.inOutQuad, onDone: () => Engine.nextChapter() });
@@ -4325,7 +4336,7 @@ SCENES.ch4 = {
     yield S.text('She received the habit, and with it a new name: Sister Maria Faustyna of the Blessed Sacrament.');
     yield S.text('She had hoped, perhaps, for ecstasies. She was given the kitchen.');
     S.do(() => Hint.show('hold and move gently — hurry earns nothing', { ttl: 7 }));
-    yield S.waitFor(() => sc.stations.every(s => s.bloom >= 1));
+    yield S.waitFor(() => sc.stations.every(s => s.bloom >= 1), { hint: 'hold and move gently — hurry earns nothing', hintAfter: 8 });
     S.do(() => { sc.allDone = true; });
     yield S.wait(2);
     yield S.text('Great love can change small things into great ones, and it is only love which lends value to our actions.', { quote: true, attr: 'Diary, 303' });
@@ -5003,17 +5014,17 @@ SCENES.ch6 = {
     yield S.text('Vilnius. In September of 1935, she saw in the sky an angel — the executor of God’s wrath, sent to strike the earth.');
     yield S.text('She began to plead for the world — and heard, rising within her, words she had never learned.');
     S.do(() => { sc.phase = 'bigbead'; Hint.show('press with the slow ring — begin', { ttl: 7 }); });
-    yield S.waitFor(() => sc.phase === 'decade' );
+    yield S.waitFor(() => sc.phase === 'decade', { hint: 'press with the slow ring — begin', hintAfter: 8 });
     yield S.textAuto('Eternal Father, I offer You the Body and Blood, Soul and Divinity of Your dearly beloved Son, Our Lord Jesus Christ, in atonement for our sins and those of the whole world.', 8, { voice: true, attr: 'Diary, 476' });
-    yield S.waitFor(() => sc.decadeBeads >= 10);
+    yield S.waitFor(() => sc.decadeBeads >= 10, { hint: 'each small bead — with the ring', hintAfter: 7 });
     S.do(() => { sc.phase = 'bridge'; sc.decadesDone = 1; });
     yield S.wait(1.2);
     yield S.text('Ten times on the small beads: For the sake of His sorrowful Passion, have mercy on us and on the whole world.', { quote: true, attr: 'Diary, 476' });
     yield S.text('And again. And again — five decades, fifty pleas, on ordinary rosary beads.');
     S.do(() => { sc.phase = 'cascade'; Hint.show('hold — and pray on', { ttl: 6 }); });
-    yield S.waitFor(() => sc.cascade >= 24);
+    yield S.waitFor(() => sc.cascade >= 24, { hint: 'hold — and pray on', hintAfter: 6 });
     S.do(() => { sc.phase = 'holy'; sc.decadesDone = 5; Hint.show('three times — Holy God', { ttl: 6 }); });
-    yield S.waitFor(() => sc.holyCount >= 3);
+    yield S.waitFor(() => sc.holyCount >= 3, { hint: 'three times — Holy God', hintAfter: 6 });
     S.do(() => {
       sc.phase = 'dawn';
       Tweens.to(sc, { dawn: 1, storm: 0 }, 7, { ease: Ease.inOutSine });
@@ -5438,7 +5449,7 @@ SCENES.ch7 = {
       Tweens.to(v, { lift: 1, warmth: 0.7 }, 2.4, { ease: Ease.inOutSine });
       Engine.after(1800, () => { v.state = 'resolved'; });
     } else {
-      Hint.show('hold', { ttl: 4 });
+      Hint.show('hold');   // persists until the prayer is answered — onFull hides it
       v.state = 'praying';
       this.prayHold = new PrayBloom({
         riseTime: 1.6, fall: 0.3,
@@ -5658,11 +5669,11 @@ SCENES.ch8 = {
     S.do(() => Hint.show('hold —', { ttl: 3.4 }));
     yield S.wait(4);
     S.do(() => Hint.show('…nothing answers. keep walking.', { ttl: 5 }));
-    yield S.waitFor(() => sc.hero.x > sc.worldEnd * 0.5);
+    yield S.waitFor(() => sc.hero.x > sc.worldEnd * 0.5, { hint: '…nothing answers. keep walking.', hintAfter: 8 });
     S.do(() => { sc.benchSaid = true; });
     yield S.text('She kept a dry record of those weeks. No comfort in it — only this:');
     yield S.text('Suffering is a great grace; through suffering the soul becomes like the Savior; in suffering love becomes crystallized.', { quote: true, attr: 'Diary, 57' });
-    yield S.waitFor(() => sc.hero.x > sc.worldEnd * 0.96);
+    yield S.waitFor(() => sc.hero.x > sc.worldEnd * 0.96, { hint: '…nothing answers. keep walking.', hintAfter: 8 });
     /* the bell */
     S.do(() => sc._bells());
     yield S.wait(6.4);
@@ -5848,13 +5859,13 @@ SCENES.ch9 = {
     yield S.textAuto('Kraków-Łagiewniki. The night of the fifth of October, 1938.', 4.6);
     yield S.textAuto('She was thirty-three — the age of her Lord.', 4.2);
     S.do(() => Hint.show('breathe with her — hold… and release', { ttl: 6 }));
-    yield S.waitFor(() => sc.cycle >= 1);
+    yield S.waitFor(() => sc.cycle >= 1, { hint: 'breathe with her — hold… and release', hintAfter: 7 });
     yield S.textAuto('The sisters knelt at the bed. The candle kept its small vigil.', 4.6);
-    yield S.waitFor(() => sc.cycle >= 2);
+    yield S.waitFor(() => sc.cycle >= 2, { hint: 'breathe with her — hold… and release', hintAfter: 8 });
     yield S.textAuto('You are the secretary of My mercy; I have chosen you for that office in this life and the next life.', 6, { voice: true, attr: 'Diary, 1605' });
-    yield S.waitFor(() => sc.cycle >= sc.cyclesNeeded);
+    yield S.waitFor(() => sc.cycle >= sc.cyclesNeeded, { hint: 'breathe with her — hold… and release', hintAfter: 8 });
     S.do(() => { sc.phase = 'finalhold'; Hint.show('hold', { ttl: 4 }); });
-    yield S.waitFor(() => sc.released);
+    yield S.waitFor(() => sc.released, { hint: 'hold', hintAfter: 6 });
     /* the passage */
     yield S.wait(2.4);                                  // held black silence
     S.do(() => sc._light());
