@@ -54,7 +54,7 @@ I18N.dict.pl = {
     'Trzecie dziecko, Helenka, obudziła się w nocy. Coś wołało ją po imieniu.',
   'hold — and stay awhile': 'przytrzymaj — i pozostań chwilę',
   'It was in the seventh year of my life that, for the first time, I heard God’s voice in my soul; that is, an invitation to a more perfect life.':
-    'W siódmym roku życia po raz pierwszy usłyszałam głos Boży w duszy, czyli zaproszenie do życia doskonalszego.',
+    'W siódmym roku życia usłyszałam pierwszy raz głos Boży w duszy, czyli zaproszenie do życia doskonalszego.',
   'She was seven. For years she would try to outgrow it, the way one outgrows a dress.':
     'Miała siedem lat. Przez lata próbowała z tego wyrosnąć, jak wyrasta się z sukienki.',
   'The voice did not outgrow her.': 'Głos z niej nie wyrósł.',
@@ -119,7 +119,7 @@ I18N.dict.pl = {
     'Może liczyła na ekstazy. Dostała kuchnię.',
   'hold and move gently — hurry earns nothing': 'przytrzymaj i poruszaj łagodnie — pośpiech nic nie daje',
   'Great love can change small things into great ones, and it is only love which lends value to our actions.':
-    'Miłość wielka umie małe rzeczy zamieniać na rzeczy wielkie i tylko miłość nadaje czynom naszym wartość.',
+    'Wielka miłość rzeczy małe umie zamieniać na rzeczy wielkie i tylko miłość nadaje czynom naszym wartość.',
   'One evening the great pot was too heavy for her strength, and she was ashamed to ask.':
     'Pewnego wieczoru wielki kocioł był ponad jej siły, a wstydziła się prosić o pomoc.',
   'Out of obedience, she tried again —': 'Z posłuszeństwa spróbowała raz jeszcze —',
@@ -167,10 +167,10 @@ I18N.dict.pl = {
     'Zaczęła błagać za światem — i usłyszała, jak wznoszą się w niej słowa, których nigdy się nie uczyła.',
   'press with the slow ring — begin': 'naciskaj z powolnym kręgiem — zacznij',
   'Eternal Father, I offer You the Body and Blood, Soul and Divinity of Your dearly beloved Son, Our Lord Jesus Christ, in atonement for our sins and those of the whole world.':
-    'Ojcze Przedwieczny, ofiaruję Ci Ciało i Krew, Duszę i Bóstwo najmilszego Syna Twojego, a Pana naszego Jezusa Chrystusa, na przebłaganie za grzechy nasze i całego świata.',
+    'Ojcze Przedwieczny, ofiaruję Ci Ciało i Krew, Duszę i Bóstwo najmilszego Syna Twojego, a Pana naszego Jezusa Chrystusa, na przebłaganie za grzechy nasze i świata całego.',
   'each small bead — with the ring': 'każdy mały paciorek — z kręgiem',
   'Ten times on the small beads: For the sake of His sorrowful Passion, have mercy on us and on the whole world.':
-    'Dziesięć razy na małych paciorkach: Dla Jego bolesnej męki miej miłosierdzie dla nas i całego świata.',
+    'Dziesięć razy na małych paciorkach: Dla Jego bolesnej męki miej miłosierdzie dla nas i świata całego.',
   'And again. And again — five decades, fifty pleas, on ordinary rosary beads.':
     'I znowu. I znowu — pięć dziesiątek, pięćdziesiąt błagań, na zwykłych paciorkach różańca.',
   'hold — and pray on': 'przytrzymaj — i módl się dalej',
@@ -182,7 +182,7 @@ I18N.dict.pl = {
   'She wrote the words down. The world still prays them every day, at three o’clock, on ordinary beads.':
     'Zapisała te słowa. Świat odmawia je do dziś, codziennie o trzeciej, na zwykłych paciorkach.',
   'for the sake of His sorrowful Passion, have mercy on us and on the whole world':
-    'dla Jego bolesnej męki miej miłosierdzie dla nas i całego świata',
+    'dla Jego bolesnej męki miej miłosierdzie dla nas i świata całego',
   'Holy God…': 'Święty Boże…',
   'Holy Mighty One…': 'Święty Mocny…',
   'Holy Immortal One…': 'Święty Nieśmiertelny…',
@@ -236,11 +236,11 @@ I18N.dict.pl = {
   'He ate. And as she took back the bowl, the rain forgot to fall.':
     'Zjadł. A gdy odbierała miskę, deszcz zapomniał padać.',
   'My daughter, the blessings of the poor who bless Me as they leave this gate have reached My ears. And this is why I came down from My throne — to taste the fruits of your mercy.':
-    'Córko Moja, doszły do uszu Moich błogosławieństwa ubogich, którzy odchodząc od tej furty, błogosławią Mi. I dlatego zszedłem z tronu — by skosztować owoców miłosierdzia twego.',
+    'Córko Moja, doszły uszu Moich błogosławieństwa ubogich, którzy oddalając się od furty, błogosławią Mi. I dlatego zszedłem z tronu — aby skosztować owocu miłosierdzia twego.',
   'I am giving you three ways of exercising mercy toward your neighbor: the first — by deed, the second — by word, the third — by prayer.':
     'Podaję ci trzy sposoby czynienia miłosierdzia bliźnim: pierwszy — czyn, drugi — słowo, trzeci — modlitwa.',
   'Help me, O Lord, that my eyes may be merciful, so that I may never suspect or judge from appearances, but look for what is beautiful in my neighbors’ souls.':
-    'Dopomóż mi, Panie, aby oczy moje były miłosierne, bym nigdy nie podejrzewała i nie sądziła według zewnętrznych pozorów, ale upatrywała to, co piękne w duszach bliźnich.',
+    'Dopomóż mi do tego, o Panie, aby oczy moje były miłosierne, bym nigdy nie podejrzewała i nie sądziła według zewnętrznych pozorów, ale upatrywała to, co piękne w duszach bliźnich.',
   'Deed': 'Czyn',
   'Word': 'Słowo',
   'Prayer': 'Modlitwa',
@@ -260,15 +260,15 @@ I18N.dict.pl = {
   'She kept a dry record of those weeks. No comfort in it — only this:':
     'Prowadziła suchy zapis tamtych tygodni. Nie ma w nim pociechy — tylko to:',
   'Suffering is a great grace; through suffering the soul becomes like the Savior; in suffering love becomes crystallized.':
-    'Cierpienie jest wielką łaską; przez cierpienie dusza upodabnia się do Zbawiciela; w cierpieniu krystalizuje się miłość.',
+    'Cierpienie jest wielką łaską. Przez cierpienie dusza upodabnia się do Zbawiciela, w cierpieniu krystalizuje się miłość.',
   'As often as you hear the clock strike the third hour, immerse yourself completely in My mercy, adoring and glorifying it.':
     'Ile razy usłyszysz, jak zegar bije trzecią godzinę, zanurzaj się cała w miłosierdziu Moim, uwielbiając i wysławiając je.',
   'In this hour, I will refuse nothing to the soul that makes a request of Me in virtue of My Passion.':
-    'W godzinie tej nie odmówię duszy niczego, która Mnie prosi przez mękę Moją.',
+    'W tej godzinie nie odmówię duszy niczego, która Mnie prosi przez mękę Moją.',
   'The flame had not answered her holding. It returned anyway — not earned. Given.':
     'Płomień nie odpowiedział na jej trzymanie. Wrócił mimo to — nie wysłużony. Darowany.',
   'The graces of My mercy are drawn by means of one vessel only, and that is — trust. The more a soul trusts, the more it will receive.':
-    'Łaski z Mojego miłosierdzia czerpie się jednym naczyniem, a jest nim — ufność. Im dusza więcej zaufa, tym więcej otrzyma.',
+    'Łaski z Mojego miłosierdzia czerpie się jednym naczyniem, a nim jest — ufność. Im dusza więcej zaufa, tym więcej otrzyma.',
   'where is He now?': 'gdzie On jest teraz?',
   'you imagined all of it': 'wszystko sobie wymyśliłaś',
   'a cook — a prophet?': 'kucharka — prorokini?',
@@ -285,7 +285,7 @@ I18N.dict.pl = {
   'The sisters knelt at the bed. The candle kept its small vigil.':
     'Siostry uklękły przy łóżku. Świeca trwała w swoim małym czuwaniu.',
   'You are the secretary of My mercy; I have chosen you for that office in this life and the next life.':
-    'Jesteś sekretarką Mojego miłosierdzia; wybrałem cię na ten urząd w tym i przyszłym życiu.',
+    'Jesteś sekretarką Mojego miłosierdzia, wybrałem cię na ten urząd w tym i przyszłym życiu.',
   '— let go': '— puść',
 
   /* ---- epilogue ---- */

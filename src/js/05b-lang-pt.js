@@ -53,7 +53,7 @@ I18N.dict.pt = {
     'A terceira filha, Helena, acordou na noite. Algo a chamava pelo nome.',
   'hold — and stay awhile': 'segure — e permaneça um pouco',
   'It was in the seventh year of my life that, for the first time, I heard God’s voice in my soul; that is, an invitation to a more perfect life.':
-    'Foi no sétimo ano da minha vida que, pela primeira vez, ouvi a voz de Deus na alma, isto é, o convite a uma vida mais perfeita.',
+    'Aos sete anos de vida ouvi pela primeira vez a voz de Deus em minha alma, isto é, o convite a uma vida mais perfeita.',
   'She was seven. For years she would try to outgrow it, the way one outgrows a dress.':
     'Ela tinha sete anos. Por anos tentaria deixar aquilo para trás, como se deixa um vestido que ficou pequeno.',
   'The voice did not outgrow her.': 'A voz nunca ficou pequena.',
@@ -69,7 +69,7 @@ I18N.dict.pt = {
   'But Helena saw only Him — racked with pain, stripped of His clothing, covered in wounds.':
     'Mas Helena via somente a Ele — torturado de dor, despojado das vestes, coberto de feridas.',
   'How long shall I put up with you and how long will you keep putting Me off?':
-    'Até quando hei de suportar-te, e até quando vais Me iludir?',
+    'Até quando hei de ter paciência contigo? Até quando Me enganarás?',
   'there is nothing here — hold, and walk away': 'não há nada aqui — segure, e vá embora',
   'The Cathedral of Saint Stanislaus Kostka. She did not remember walking there.':
     'A Catedral de Santo Estanislau Kostka. Ela não se lembrava de ter caminhado até lá.',
@@ -77,7 +77,7 @@ I18N.dict.pt = {
     'Prostrou-se diante do Santíssimo Sacramento e perguntou o que Ele queria dela.',
   'hold': 'segure',
   'Go at once to Warsaw; you will enter a convent there.':
-    'Vai imediatamente a Varsóvia; lá entrarás num convento.',
+    'Vai imediatamente a Varsóvia, lá entrarás num convento.',
   'She went home only to pack a small bag, and asked her sister to say goodbye for her.':
     'Foi para casa apenas para arrumar uma pequena mala, e pediu à irmã que se despedisse por ela.',
   'She was nineteen, and she had stopped pretending.':
@@ -102,7 +102,7 @@ I18N.dict.pt = {
   '“Go and ask the Lord of the house whether He will accept you.”':
     '“Vá perguntar ao Senhor da casa se Ele a aceita.”',
   'hold — and ask': 'segure — e pergunte',
-  'I do accept; you are in My Heart.': 'Eu te aceito; estás no Meu Coração.',
+  'I do accept; you are in My Heart.': 'Eu te aceito, tu estás no Meu Coração.',
   'Accepted — on one condition. She must earn the clothes she would renounce.':
     'Aceita — com uma condição. Precisaria pagar o enxoval das vestes que iria renunciar.',
   'A year in service at Ostrówek: other people’s laundry, other people’s children, coin by coin.':
@@ -118,7 +118,7 @@ I18N.dict.pt = {
     'Ela esperava, talvez, êxtases. Deram-lhe a cozinha.',
   'hold and move gently — hurry earns nothing': 'segure e mova com suavidade — a pressa não rende nada',
   'Great love can change small things into great ones, and it is only love which lends value to our actions.':
-    'O amor grande sabe transformar as coisas pequenas em grandes, e somente o amor dá valor aos nossos atos.',
+    'Um grande amor consegue transformar coisas pequenas em coisas grandes, e só ele dá valor às nossas ações.',
   'One evening the great pot was too heavy for her strength, and she was ashamed to ask.':
     'Uma noite, o grande caldeirão pesava mais que as suas forças, e ela teve vergonha de pedir ajuda.',
   'Out of obedience, she tried again —': 'Por obediência, tentou de novo —',
@@ -130,11 +130,11 @@ I18N.dict.pt = {
   'Płock. The evening of the 22nd of February, 1931. She was alone in her cell.':
     'Płock. A noite de 22 de fevereiro de 1931. Ela estava sozinha em sua cela.',
   'In the evening, when I was in my cell, I saw the Lord Jesus clothed in a white garment.':
-    'À noite, estando na cela, vi o Senhor Jesus vestido com uma túnica branca.',
+    'À noite, quando estava na minha cela, vi o Senhor Jesus vestido com uma túnica branca.',
   'Paint an image according to the pattern you see, with the signature: Jesus, I trust in You.':
-    'Pinta uma imagem segundo o modelo que vês, com a inscrição: Jesus, eu confio em Vós.',
+    'Pinta uma Imagem de acordo com o modelo que estás vendo, com a inscrição: Jesus, eu confio em Vós.',
   'I promise that the soul that will venerate this image will not perish.':
-    'Prometo que a alma que venerar esta imagem não perecerá.',
+    'Prometo que a alma que venerar esta Imagem não perecerá.',
   'She was twenty-five — a convent cook who had never once held a brush.':
     'Ela tinha vinte e cinco anos — uma cozinheira de convento que jamais segurara um pincel.',
   'For three years the command followed her. Confessors shrugged. Superiors frowned.':
@@ -149,11 +149,11 @@ I18N.dict.pt = {
   'and the pale ray, beside it': 'e o raio pálido, ao lado',
   'sign it — trace the words, left to right': 'assine — trace as palavras, da esquerda para a direita',
   'The pale ray stands for the Water which makes souls righteous. The red ray stands for the Blood which is the life of souls. — Diary, 299':
-    'O raio pálido significa a Água que justifica as almas. O raio vermelho significa o Sangue que é a vida das almas. — Diário, 299',
+    'O raio pálido significa a Água que justifica as almas; o raio vermelho significa o Sangue, que é a vida das almas. — Diário, 299',
   'It was finished. And Sister Faustina wept.': 'Estava terminada. E a Irmã Faustina chorou.',
   '“Who will paint You as beautiful as You are?”': '“Quem Vos pintará tão belo como sois?”',
   'Not in the beauty of the color, nor of the brush, lies the greatness of this image, but in My grace.':
-    'Nem na beleza das cores, nem do pincel está a grandeza desta imagem, mas na Minha graça.',
+    'Não está a grandeza desta imagem na beleza das cores nem do pincel, mas na Minha graça.',
   'Whatever your hand just made — it was enough. It was never about the brush.':
     'O que a sua mão acabou de fazer — foi suficiente. Nunca foi sobre o pincel.',
   'In April 1935 the image was hung high in the Gate of Dawn, and a city looked up at it.':
@@ -166,7 +166,7 @@ I18N.dict.pt = {
     'Começou a suplicar pelo mundo — e ouviu, subindo dentro dela, palavras que nunca aprendera.',
   'press with the slow ring — begin': 'pressione com o anel lento — comece',
   'Eternal Father, I offer You the Body and Blood, Soul and Divinity of Your dearly beloved Son, Our Lord Jesus Christ, in atonement for our sins and those of the whole world.':
-    'Eterno Pai, eu Vos ofereço o Corpo e Sangue, Alma e Divindade de Vosso diletíssimo Filho, Nosso Senhor Jesus Cristo, em expiação dos nossos pecados e dos do mundo inteiro.',
+    'Eterno Pai, eu Vos ofereço o Corpo e o Sangue, a Alma e a Divindade do Vosso diletíssimo Filho, Nosso Senhor Jesus Cristo, em expiação dos nossos pecados e dos do mundo inteiro.',
   'each small bead — with the ring': 'cada conta pequena — com o anel',
   'Ten times on the small beads: For the sake of His sorrowful Passion, have mercy on us and on the whole world.':
     'Dez vezes nas contas pequenas: Pela Sua dolorosa Paixão, tende misericórdia de nós e do mundo inteiro.',
@@ -177,14 +177,14 @@ I18N.dict.pt = {
   'The arm did not fall. Before those words, the angel stood helpless — and the storm knelt.':
     'O braço não caiu. Diante daquelas palavras, o anjo ficou impotente — e a tempestade se ajoelhou.',
   'Whoever will recite it will receive great mercy at the hour of death.':
-    'Quem o rezar receberá grande misericórdia na hora da morte.',
+    'Todo aquele que o recitar alcançará grande misericórdia na hora da morte.',
   'She wrote the words down. The world still prays them every day, at three o’clock, on ordinary beads.':
     'Ela escreveu as palavras. O mundo ainda as reza todos os dias, às três horas, em contas comuns.',
   'for the sake of His sorrowful Passion, have mercy on us and on the whole world':
     'pela Sua dolorosa Paixão, tende misericórdia de nós e do mundo inteiro',
   'Holy God…': 'Deus Santo…',
-  'Holy Mighty One…': 'Santo Forte…',
-  'Holy Immortal One…': 'Santo Imortal…',
+  'Holy Mighty One…': 'Deus Forte…',
+  'Holy Immortal One…': 'Deus Imortal…',
 
   /* ---- ch7 ---- */
   'Kraków. Hard years. The convent made her portress — keeper of the gate.':
@@ -235,11 +235,11 @@ I18N.dict.pt = {
   'He ate. And as she took back the bowl, the rain forgot to fall.':
     'Ele comeu. E quando ela recolheu a tigela, a chuva esqueceu de cair.',
   'My daughter, the blessings of the poor who bless Me as they leave this gate have reached My ears. And this is why I came down from My throne — to taste the fruits of your mercy.':
-    'Minha filha, chegaram aos Meus ouvidos as bênçãos dos pobres que Me bendizem ao deixar este portão. E por isso desci do Meu trono — para provar os frutos da tua misericórdia.',
+    'Minha filha, chegaram aos Meus ouvidos as bênçãos dos pobres que, afastando-se desta porta, Me bendizem. E por isso desci do trono — para saborear o fruto da tua misericórdia.',
   'I am giving you three ways of exercising mercy toward your neighbor: the first — by deed, the second — by word, the third — by prayer.':
-    'Dou-te três maneiras de exercer misericórdia para com o próximo: a primeira — pela ação; a segunda — pela palavra; a terceira — pela oração.',
+    'Eu te indico três maneiras de praticar a misericórdia para com o próximo: a primeira — é a ação; a segunda — a palavra; e a terceira — a oração.',
   'Help me, O Lord, that my eyes may be merciful, so that I may never suspect or judge from appearances, but look for what is beautiful in my neighbors’ souls.':
-    'Ajudai-me, Senhor, para que os meus olhos sejam misericordiosos, para que eu jamais suspeite ou julgue pelas aparências, mas busque o que é belo na alma do meu próximo.',
+    'Ajuda-me, ó Senhor, que os meus olhos sejam misericordiosos, para que eu jamais suspeite ou julgue segundo as aparências, mas procure o que é belo na alma do meu próximo.',
   'Deed': 'Ação',
   'Word': 'Palavra',
   'Prayer': 'Oração',
@@ -259,15 +259,15 @@ I18N.dict.pt = {
   'She kept a dry record of those weeks. No comfort in it — only this:':
     'Ela manteve um registro seco daquelas semanas. Nenhum consolo nele — apenas isto:',
   'Suffering is a great grace; through suffering the soul becomes like the Savior; in suffering love becomes crystallized.':
-    'O sofrimento é uma grande graça; pelo sofrimento a alma se assemelha ao Salvador; no sofrimento o amor se cristaliza.',
+    'O sofrimento é uma grande graça; através do sofrimento a alma torna-se semelhante ao Salvador; no sofrimento o amor se cristaliza.',
   'As often as you hear the clock strike the third hour, immerse yourself completely in My mercy, adoring and glorifying it.':
-    'Todas as vezes que ouvires o relógio bater a terceira hora, imerge-te toda na Minha misericórdia, adorando-a e glorificando-a.',
+    'Todas as vezes que ouvires o bater do relógio às três horas, mergulha toda na Minha misericórdia, adorando-A e glorificando-A.',
   'In this hour, I will refuse nothing to the soul that makes a request of Me in virtue of My Passion.':
-    'Nesta hora, nada negarei à alma que Me pedir em virtude da Minha Paixão.',
+    'Nessa hora nada negarei à alma que Me pedir pela Minha Paixão.',
   'The flame had not answered her holding. It returned anyway — not earned. Given.':
     'A chama não respondera ao seu segurar. Voltou assim mesmo — não conquistada. Dada.',
   'The graces of My mercy are drawn by means of one vessel only, and that is — trust. The more a soul trusts, the more it will receive.':
-    'As graças da Minha misericórdia se recebem com um único vaso, que é — a confiança. Quanto mais a alma confiar, tanto mais receberá.',
+    'As graças da Minha misericórdia colhem-se com um único vaso — que é a confiança. Quanto mais a alma confiar, tanto mais receberá.',
   'where is He now?': 'onde está Ele agora?',
   'you imagined all of it': 'você imaginou tudo isso',
   'a cook — a prophet?': 'uma cozinheira — profetisa?',
@@ -284,7 +284,7 @@ I18N.dict.pt = {
   'The sisters knelt at the bed. The candle kept its small vigil.':
     'As irmãs se ajoelharam junto à cama. A vela mantinha sua pequena vigília.',
   'You are the secretary of My mercy; I have chosen you for that office in this life and the next life.':
-    'Tu és a secretária da Minha misericórdia; escolhi-te para esse ofício nesta vida e na vida futura.',
+    'És a secretária da Minha misericórdia; Eu te escolhi para essa função nesta e na outra vida.',
   '— let go': '— solte',
 
   /* ---- epilogue ---- */
@@ -312,7 +312,7 @@ I18N.dict.pt = {
   '— became this one, by Eugeniusz Kazimirowski · Vilnius, 1934':
     '— tornou-se esta, de Eugeniusz Kazimirowski · Vilnius, 1934',
   '“Not in the beauty of the color, nor of the brush… but in My grace.”':
-    '“Nem na beleza das cores, nem do pincel… mas na Minha graça.”',
+    '“Não está a grandeza desta imagem na beleza das cores nem do pincel… mas na Minha graça.”',
   'vessel of mercy — a story from the Diary of Saint Faustina Kowalska':
     'vaso de misericórdia — uma história do Diário de Santa Faustina Kowalska',
 };
