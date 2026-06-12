@@ -55,8 +55,8 @@ I18N.dict.pt = {
   'It was in the seventh year of my life that, for the first time, I heard God’s voice in my soul; that is, an invitation to a more perfect life.':
     'Foi no sétimo ano da minha vida que, pela primeira vez, ouvi a voz de Deus na alma, isto é, o convite a uma vida mais perfeita.',
   'She was seven. For years she would try to outgrow it, the way one outgrows a dress.':
-    'Ela tinha sete anos. Por anos tentaria crescer para além daquilo, como quem cresce e deixa um vestido.',
-  'The voice did not outgrow her.': 'A voz não a deixou.',
+    'Ela tinha sete anos. Por anos tentaria deixar aquilo para trás, como se deixa um vestido que ficou pequeno.',
+  'The voice did not outgrow her.': 'A voz nunca ficou pequena.',
 
   /* ---- ch2 ---- */
   'Łódź. Twelve years later.': 'Łódź. Doze anos depois.',
@@ -82,7 +82,7 @@ I18N.dict.pt = {
     'Foi para casa apenas para arrumar uma pequena mala, e pediu à irmã que se despedisse por ela.',
   'She was nineteen, and she had stopped pretending.':
     'Tinha dezenove anos, e havia parado de fingir.',
-  'THE EVENING': 'A NOITE',
+  'THE EVENING': 'A FESTA',
 
   /* ---- ch3 ---- */
   'Warsaw. She arrived with one bag and no one waiting.':
@@ -94,7 +94,7 @@ I18N.dict.pt = {
   'There was another door.': 'Havia outra porta.',
   'And another.': 'E mais outra.',
   'She knocked on many doors that summer. The answer learned her face.':
-    'Bateu a muitas portas naquele verão. A recusa aprendeu o rosto dela.',
+    'Bateu a muitas portas naquele verão. O “não” aprendeu o rosto dela.',
   'One door remained — Żytnia Street: the Sisters of Our Lady of Mercy.':
     'Restava uma porta — rua Żytnia: as Irmãs de Nossa Senhora da Misericórdia.',
   'The superior, Mother Michael, studied the small girl in the worn dress.':

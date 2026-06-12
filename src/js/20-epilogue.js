@@ -172,15 +172,20 @@ SCENES.epilogue = {
     }
     /* caption */
     g.textAlign = 'center';
-    g.fillStyle = 'rgba(232,201,138,0.85)';
-    g.font = `${Math.round(w * 0.026)}px Georgia,serif`;
-    g.fillText('F A U S T Y N A', w / 2, h * 0.915);
-    g.fillStyle = 'rgba(236,229,216,0.6)';
-    g.font = `italic ${Math.round(w * 0.022)}px Georgia,serif`;
-    g.fillText(tr('“Not in the beauty of the color, nor of the brush… but in My grace.”'), w / 2, h * 0.95);
-    g.fillStyle = 'rgba(236,229,216,0.4)';
-    g.font = `${Math.round(w * 0.017)}px Georgia,serif`;
-    g.fillText(tr('Diary, 313'), w / 2, h * 0.975);
+    g.fillStyle = 'rgba(232,201,138,0.9)';
+    g.font = `${Math.round(w * 0.040)}px Georgia,serif`;
+    g.fillText('F A U S T Y N A', w / 2, h * 0.905);
+    g.fillStyle = 'rgba(236,229,216,0.75)';
+    const quote = tr('“Not in the beauty of the color, nor of the brush… but in My grace.”');
+    let qs = Math.round(w * 0.032);
+    g.font = `italic ${qs}px Georgia,serif`;
+    while (g.measureText(quote).width > w * 0.94 && qs > 12) {   // long translations shrink to fit
+      qs--; g.font = `italic ${qs}px Georgia,serif`;
+    }
+    g.fillText(quote, w / 2, h * 0.945);
+    g.fillStyle = 'rgba(236,229,216,0.5)';
+    g.font = `${Math.round(w * 0.022)}px Georgia,serif`;
+    g.fillText(tr('Diary, 313'), w / 2, h * 0.978);
   },
 
   onPress() {},
