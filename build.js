@@ -98,7 +98,7 @@ if (process.argv.includes('test')) {
   });
 })();
 </script>`;
-  const testOut = render('\nwindow.__G = { Engine, Input, Audio, Save, Painting, Choices, Text };')
+  const testOut = render('\nwindow.__G = { Engine, Input, Audio, Save, Painting, Choices, Text, I18N, Menu, UI, tr };')
     .replace('</body>', driver + '\n</body>');
   fs.writeFileSync(path.join(ROOT, 'test.html'), testOut);
   console.log('built test.html (auto-driver)');
