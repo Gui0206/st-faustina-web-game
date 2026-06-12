@@ -142,31 +142,31 @@ SCENES.ch9 = {
     ctx.strokeStyle = '#070509'; ctx.lineWidth = 8;
     ctx.strokeRect(-560, 220, 130, 180);
     lamp(ctx, -495, 310, 90, 'rgba(170,190,240,0.3)', 0.5 - dim * 0.3, t, 0.02);
-    /* the bed */
+    /* the bed — a modest convent cot, scaled to the sisters kneeling beside it */
     ctx.fillStyle = '#15101a';
-    ctx.fillRect(-260, 640, 560, 130);
+    ctx.fillRect(-150, 660, 320, 92);
     ctx.fillStyle = '#1d1722';
-    ctx.fillRect(-280, 620, 40, 160);
+    ctx.fillRect(-166, 632, 26, 130);
     ctx.fillStyle = '#241d2b';
-    ctx.fillRect(280, 620, 40, 160);
+    ctx.fillRect(160, 642, 26, 120);
     /* her form, white linen */
     const breathLift = this.phase === 'breathe' ? this.breath * 7 : Math.max(0, 4 - this.finalHold);
     ctx.fillStyle = mixHex('#c9bfae', '#8e887e', dim * 0.6);
     ctx.beginPath();
-    ctx.moveTo(-220, 660);
-    ctx.quadraticCurveTo(-160, 626 - breathLift, -40, 632 - breathLift);
-    ctx.quadraticCurveTo(140, 640, 240, 656);
-    ctx.lineTo(240, 690); ctx.lineTo(-220, 690);
+    ctx.moveTo(-128, 676);
+    ctx.quadraticCurveTo(-92, 652 - breathLift, -16, 656 - breathLift);
+    ctx.quadraticCurveTo(78, 662, 142, 672);
+    ctx.lineTo(142, 700); ctx.lineTo(-128, 700);
     ctx.closePath(); ctx.fill();
     /* her face — only suggested: a pale oval turned upward */
     ctx.fillStyle = mixHex('#d8cdbb', '#a39a8c', dim * 0.5);
-    ctx.beginPath(); ctx.ellipse(-176, 642 - breathLift, 22, 16, -0.2, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(-102, 660 - breathLift, 14, 11, -0.2, 0, TAU); ctx.fill();
     /* kneeling sisters at the bedside, bowed against the lit linen */
-    R.nun(ctx, -330, 836, 215, { kneel: true, bow: 0.5, color: '#0b0910' });
-    R.nun(ctx, 150, 846, 228, { kneel: true, bow: 0.4, color: '#0b0910', flip: true });
+    R.nun(ctx, -128, 816, 215, { kneel: true, bow: 0.5, color: '#0b0910' });
+    R.nun(ctx, 86, 824, 228, { kneel: true, bow: 0.4, color: '#0b0910', flip: true });
     /* vigil candle */
-    R.candle(ctx, 360, 640, 70, t, 0.85 - dim * 0.4);
-    lamp(ctx, 360, 590, 120, 'rgba(255,180,100,0.45)', 0.7 - dim * 0.4, t);
+    R.candle(ctx, 248, 660, 64, t, 0.85 - dim * 0.4);
+    lamp(ctx, 248, 610, 110, 'rgba(255,180,100,0.45)', 0.7 - dim * 0.4, t);
 
     /* breath ring */
     if (this.phase === 'breathe') {
