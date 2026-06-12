@@ -152,7 +152,7 @@ SCENES.epilogue = {
     rad.addColorStop(0, `rgba(255,238,200,${0.16 + fade * 0.1})`);
     rad.addColorStop(1, 'rgba(255,238,200,0)');
     g.fillStyle = rad; g.fillRect(0, 0, w, h);
-    const pw = w * 0.78, ph = h * 0.78, px = (w - pw) / 2, py = h * 0.06;
+    const pw = w * 0.78, ph = h * 0.75, px = (w - pw) / 2, py = h * 0.06;
     /* the player's painting, letting go */
     if (fade < 1) {
       g.save();
@@ -174,18 +174,21 @@ SCENES.epilogue = {
     g.textAlign = 'center';
     g.fillStyle = 'rgba(232,201,138,0.9)';
     g.font = `${Math.round(w * 0.040)}px Georgia,serif`;
-    g.fillText('F A U S T Y N A', w / 2, h * 0.905);
+    g.fillText('F A U S T Y N A', w / 2, h * 0.875);
     g.fillStyle = 'rgba(236,229,216,0.75)';
-    const quote = tr('“Not in the beauty of the color, nor of the brush… but in My grace.”');
-    let qs = Math.round(w * 0.032);
-    g.font = `italic ${qs}px Georgia,serif`;
-    while (g.measureText(quote).width > w * 0.94 && qs > 12) {   // long translations shrink to fit
-      qs--; g.font = `italic ${qs}px Georgia,serif`;
+    g.font = `italic ${Math.round(w * 0.032)}px Georgia,serif`;
+    /* long translations wrap to a second line rather than shrinking */
+    const lines = [''];
+    for (const word of tr('“Not in the beauty of the color, nor of the brush… but in My grace.”').split(' ')) {
+      const probe = lines[lines.length - 1] ? lines[lines.length - 1] + ' ' + word : word;
+      if (g.measureText(probe).width > w * 0.9 && lines[lines.length - 1]) lines.push(word);
+      else lines[lines.length - 1] = probe;
     }
-    g.fillText(quote, w / 2, h * 0.945);
+    const qy = lines.length > 1 ? 0.92 : 0.94;
+    lines.forEach((ln, i) => g.fillText(ln, w / 2, h * (qy + i * 0.04)));
     g.fillStyle = 'rgba(236,229,216,0.5)';
     g.font = `${Math.round(w * 0.022)}px Georgia,serif`;
-    g.fillText(tr('Diary, 313'), w / 2, h * 0.978);
+    g.fillText(tr('Diary, 313'), w / 2, h * 0.985);
   },
 
   onPress() {},
