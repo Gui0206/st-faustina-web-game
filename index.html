@@ -1838,6 +1838,9 @@ const Save = {
       d.settings.reduceMotion = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
     if (typeof d.unlocked !== 'number' || !isFinite(d.unlocked)) d.unlocked = 0;
     d.unlocked = clamp(Math.floor(d.unlocked), 0, CHAPTERS.length - 1);
+    /* local debug: running from disk or localhost opens every chapter */
+    if (location.protocol === 'file:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname))
+      d.unlocked = CHAPTERS.length - 1;
     if (typeof d.chapter !== 'string' || !SCENES[d.chapter]) d.chapter = null;
     if (!Array.isArray(d.strokes)) d.strokes = null;
     d.done = !!d.done;
