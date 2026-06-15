@@ -315,4 +315,20 @@ I18N.dict.pt = {
     '“Não está a grandeza desta imagem na beleza das cores nem do pincel… mas na Minha graça.”',
   'vessel of mercy — a story from the Diary of Saint Faustina Kowalska':
     'vaso de misericórdia — uma história do Diário de Santa Faustina Kowalska',
+
+  /* ---- closing gallery ---- */
+  'Closing gallery': 'Galeria final',
+  'skip to the final images': 'ir para as imagens finais',
+  'touch to continue': 'toque para continuar',
+  'touch to return': 'toque para voltar',
+  'before she entered the convent': 'antes de entrar no convento',
+  'Sister Maria Faustina of the Blessed Sacrament':
+    'Irmã Maria Faustina do Santíssimo Sacramento',
+  '“Paint an image according to the pattern you see.”':
+    '“Pinta uma Imagem de acordo com o modelo que estás vendo.”',
+  'the apparition at Płock · 22 February 1931':
+    'a aparição em Płock · 22 de fevereiro de 1931',
+  'Saint John Paul II': 'São João Paulo II',
+  'who canonized her · Rome, 30 April 2000':
+    'que a canonizou · Roma, 30 de abril de 2000',
 };
