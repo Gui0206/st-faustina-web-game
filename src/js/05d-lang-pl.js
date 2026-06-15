@@ -322,13 +322,14 @@ I18N.dict.pl = {
   'skip to the final images': 'przejdź do końcowych obrazów',
   'touch to continue': 'dotknij, aby kontynuować',
   'touch to return': 'dotknij, aby wrócić',
-  'before the convent · Łódź, 1923': 'przed klasztorem · Łódź, 1923',
-  'Sister Maria Faustina': 'Siostra Maria Faustyna',
-  'of the Blessed Sacrament · 1925–1938': 'od Najświętszego Sakramentu · 1925–1938',
-  '“Paint an image, after this pattern that you see.”':
+  'before she entered the convent': 'zanim wstąpiła do klasztoru',
+  'Sister Maria Faustina of the Blessed Sacrament':
+    'Siostra Maria Faustyna od Najświętszego Sakramentu',
+  '“Paint an image according to the pattern you see.”':
     '„Wymaluj obraz według rysunku, który widzisz”.',
-  'the vision of the Merciful Jesus': 'wizja Jezusa Miłosiernego',
+  'the apparition at Płock · 22 February 1931':
+    'objawienie w Płocku · 22 lutego 1931',
   'Saint John Paul II': 'Święty Jan Paweł II',
-  'who gave her to the whole Church · 30 April 2000':
-    'który dał ją całemu Kościołowi · 30 kwietnia 2000',
+  'who canonized her · Rome, 30 April 2000':
+    'który ją kanonizował · Rzym, 30 kwietnia 2000',
 };

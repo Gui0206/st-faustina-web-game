@@ -6,10 +6,10 @@ SCENES.gallery = {
   id: 'gallery',
 
   slides: [
-    { src: () => HELENA_IMG,         cap: 'Helena Kowalska',                    sub: 'before the convent · Łódź, 1923' },
-    { src: () => FAUSTINA_NUN_IMG,   cap: 'Sister Maria Faustina',             sub: 'of the Blessed Sacrament · 1925–1938' },
-    { src: () => FAUSTINA_JESUS_IMG, cap: '“Paint an image, after this pattern that you see.”', sub: 'the vision of the Merciful Jesus' },
-    { src: () => JOHN_PAUL_II_IMG,   cap: 'Saint John Paul II',                sub: 'who gave her to the whole Church · 30 April 2000' },
+    { src: () => HELENA_IMG,         cap: 'Helena Kowalska',                                  sub: 'before she entered the convent' },
+    { src: () => FAUSTINA_NUN_IMG,   cap: 'Sister Maria Faustina of the Blessed Sacrament',   sub: 'Helena Kowalska · 1905–1938' },
+    { src: () => FAUSTINA_JESUS_IMG, cap: '“Paint an image according to the pattern you see.”', sub: 'the apparition at Płock · 22 February 1931' },
+    { src: () => JOHN_PAUL_II_IMG,   cap: 'Saint John Paul II',                                sub: 'who canonized her · Rome, 30 April 2000' },
   ],
 
   enter() {
@@ -23,8 +23,9 @@ SCENES.gallery = {
     this.cueA = 0;
     this.imgs = this.slides.map(s => { const im = new Image(); im.src = s.src(); return im; });
     Engine.grainAmt = 0.08;
-    Audio.pad.set([['D2', 'A2', 'D3', 'F#3'], ['G2', 'D3', 'G3', 'B3'], ['A2', 'E3', 'A3', 'C#4'], ['D2', 'A2', 'D3', 'F#3']], { level: 0.4, hold: 13, bright: 720 });
-    Audio.channels.choir.set(0.1);
+    /* a brighter, airier pad than the epilogue's dark globe — light, not dusk */
+    Audio.pad.set([['D3', 'A3', 'D4', 'F#4'], ['G3', 'D4', 'G4', 'B4'], ['A3', 'E4', 'A4', 'C#5'], ['D3', 'A3', 'D4', 'F#4']], { level: 0.4, hold: 13, bright: 1180 });
+    Audio.channels.choir.set(0.12, ['A3', 'D4', 'F#4', 'A4']);
     document.getElementById('app').classList.add('show-cursor');
     this._chime();
   },
@@ -35,8 +36,10 @@ SCENES.gallery = {
   },
 
   _chime() {
-    Audio.shimmer(0.34, 760);
-    Audio.bell('D4', 0.22, 1.6);
+    /* a bright sprinkle of light — high grains, a celesta, a bell an octave up */
+    Audio.shimmer(0.5, 1500);
+    Audio.celesta('A5', 0.3);
+    Audio.bell('D5', 0.18, 1.4);
   },
 
   _advance() {
