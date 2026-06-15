@@ -12,10 +12,16 @@ const shell = fs.readFileSync(path.join(SRC, 'shell.html'), 'utf8');
 const files = fs.readdirSync(JS).filter(f => f.endsWith('.js')).sort();
 
 /* inline assets as data URIs so index.html stays a single file */
-const mercyB64 = fs.readFileSync(path.join(SRC, 'assets', 'mercy.jpg')).toString('base64');
+const dataUri = (file, mime) =>
+  `data:${mime};base64,${fs.readFileSync(path.join(SRC, 'assets', file)).toString('base64')}`;
 
 let bundle = '"use strict";\n';
-bundle += `const MERCY_IMG = 'data:image/jpeg;base64,${mercyB64}';\n`;
+bundle += `const MERCY_IMG = '${dataUri('mercy.jpg', 'image/jpeg')}';\n`;
+/* closing gallery — the real people behind the story */
+bundle += `const HELENA_IMG = '${dataUri('helena-kowalska.jpg', 'image/jpeg')}';\n`;
+bundle += `const FAUSTINA_NUN_IMG = '${dataUri('saint-faustina.png', 'image/png')}';\n`;
+bundle += `const FAUSTINA_JESUS_IMG = '${dataUri('st-faustina-and-Jesus.jpg', 'image/jpeg')}';\n`;
+bundle += `const JOHN_PAUL_II_IMG = '${dataUri('st-john-paul-ii.jpg', 'image/jpeg')}';\n`;
 for (const f of files) {
   const code = fs.readFileSync(path.join(JS, f), 'utf8');
   bundle += `\n/* ============ ${f} ============ */\n` + code + '\n';

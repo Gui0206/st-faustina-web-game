@@ -316,4 +316,19 @@ I18N.dict.pl = {
     '„Nie w piękności farby ani pędzla… ale w łasce Mojej”.',
   'vessel of mercy — a story from the Diary of Saint Faustina Kowalska':
     'naczynie miłosierdzia — opowieść z Dzienniczka świętej Faustyny Kowalskiej',
+
+  /* ---- closing gallery ---- */
+  'Closing gallery': 'Galeria końcowa',
+  'skip to the final images': 'przejdź do końcowych obrazów',
+  'touch to continue': 'dotknij, aby kontynuować',
+  'touch to return': 'dotknij, aby wrócić',
+  'before the convent · Łódź, 1923': 'przed klasztorem · Łódź, 1923',
+  'Sister Maria Faustina': 'Siostra Maria Faustyna',
+  'of the Blessed Sacrament · 1925–1938': 'od Najświętszego Sakramentu · 1925–1938',
+  '“Paint an image, after this pattern that you see.”':
+    '„Wymaluj obraz według rysunku, który widzisz”.',
+  'the vision of the Merciful Jesus': 'wizja Jezusa Miłosiernego',
+  'Saint John Paul II': 'Święty Jan Paweł II',
+  'who gave her to the whole Church · 30 April 2000':
+    'który dał ją całemu Kościołowi · 30 kwietnia 2000',
 };

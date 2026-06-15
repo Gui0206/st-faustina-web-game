@@ -118,7 +118,7 @@ SCENES.epilogue = {
       <div class="ks-caption">${tr('Jezu, ufam Tobie — Jesus, I trust in You')}
         <small id="ks-sub">${tr('painted by your hand · Vilnius, 1934')}</small></div>
       <div style="display:flex;gap:14px">
-        <button class="ks-btn" id="ks-title">${tr('Return')}</button>
+        <button class="ks-btn" id="ks-title">${tr('Continue')}</button>
       </div>`;
     this.ksCanvas = holder.querySelector('canvas');
     this.ksFade = 0;            // 0 player's painting → 1 the real image
@@ -131,7 +131,7 @@ SCENES.epilogue = {
     this._renderKeepsake(this.ksCanvas, 0);
     holder.querySelector('#ks-title').addEventListener('click', e => {
       e.stopPropagation();
-      Engine.go('title');
+      Engine.go('gallery');     // on to the closing gallery — the real people
     });
     for (const b of holder.querySelectorAll('button')) {
       b.addEventListener('pointerdown', e => e.stopPropagation());

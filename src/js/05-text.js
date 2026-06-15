@@ -170,6 +170,11 @@ const Choices = {
 /* ---------------- pause menu ---------------- */
 const Menu = {
   open: false,
+  /* local builds (file:// or localhost) get a dev shortcut to the ending */
+  get isLocal() {
+    return location.protocol === 'file:' ||
+      /^(localhost|127\.0\.0\.1|\[::1\]|0\.0\.0\.0)$/.test(location.hostname);
+  },
   build() {
     const el = UI.els.menu;
     const langRow = I18N.LANGS.map(l =>
@@ -180,6 +185,7 @@ const Menu = {
         <div class="menu-sep"></div>
         <button class="menu-item" data-act="resume">${esc(tr('Return'))}</button>
         <button class="menu-item" data-act="restart">${esc(tr('Restart chapter'))}</button>
+        ${this.isLocal ? `<button class="menu-item" data-act="gallery">▸ ${esc(tr('Closing gallery'))}<span class="menu-sub">${esc(tr('skip to the final images'))}</span></button>` : ''}
         <div class="menu-sep"></div>
         <div id="menu-chapters"></div>
         <div class="menu-sep"></div>
@@ -214,6 +220,7 @@ const Menu = {
       const a = act.dataset.act;
       if (a === 'resume') this.toggle(false);
       if (a === 'restart') { this.toggle(false); Engine.go(Engine.scene.id, { instant: false }); }
+      if (a === 'gallery') { this.toggle(false); Engine.go('gallery'); }
       if (a === 'chapter') { this.toggle(false); Engine.go(act.dataset.id, { instant: false }); }
     });
   },
