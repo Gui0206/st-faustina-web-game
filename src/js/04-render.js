@@ -71,6 +71,38 @@ const R = {
     ctx.drawImage(c, x - r, y - r, r * 2, r * 2);
   },
 
+  /* a small stylized rose seen face-on: a ring of outer petals, a lighter
+     inner whorl, and a coiled eye. drawn at (x,y), radius r, spun by rot.
+     radially symmetric, so it reads right at any orientation. */
+  rose(ctx, x, y, r, rot, color) {
+    if (r < 0.6) return;
+    const light = mixHex(color, '#ffd9e0', 0.5);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rot);
+    ctx.fillStyle = color;
+    for (let i = 0; i < 6; i++) {
+      ctx.save();
+      ctx.rotate((i / 6) * TAU);
+      ctx.beginPath();
+      ctx.ellipse(0, -r * 0.58, r * 0.46, r * 0.34, 0, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.fillStyle = light;
+    for (let i = 0; i < 4; i++) {
+      ctx.save();
+      ctx.rotate((i / 4) * TAU + 0.5);
+      ctx.beginPath();
+      ctx.ellipse(0, -r * 0.3, r * 0.3, r * 0.22, 0, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.fillStyle = mixHex(color, '#3a0a14', 0.35);
+    ctx.beginPath(); ctx.arc(0, 0, r * 0.2, 0, TAU); ctx.fill();
+    ctx.restore();
+  },
+
   /* ---------- sky / backdrop gradient (cached per key) ---------- */
   sky(ctx, key, stops, x, y, w, h, horizontal = false) {
     let g = this._gradCache.get(key);

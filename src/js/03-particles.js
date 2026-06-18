@@ -74,6 +74,8 @@ const Particles = {
         ctx.fillStyle = p.color;
         ctx.beginPath(); ctx.ellipse(0, 0, size, size * 0.45, 0, 0, TAU); ctx.fill();
         ctx.restore();
+      } else if (p.shape === 'rose') {
+        R.rose(ctx, p.x, p.y, size, p.rot, p.color);
       } else {
         ctx.fillStyle = p.color;
         ctx.beginPath(); ctx.arc(p.x, p.y, size, 0, TAU); ctx.fill();

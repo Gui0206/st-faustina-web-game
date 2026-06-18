@@ -6,7 +6,12 @@ SCENES.ch1 = {
   enter() {
     this.t = 0;
     this.bloom = new PrayBloom({
-      riseTime: 3.4, fall: 0.1,
+      /* ch1 teaches the verb: holding must only ever build, never punish.
+         fall:0 means letting go pauses the bloom where it is — the player
+         just holds (across as many grips as they like) until the candle
+         fills, the bell sounds, and the next line comes. The bell IS the
+         "you can let go now" cue; releasing after it never undoes anything. */
+      riseTime: 2.4, fall: 0,
       onFull: () => {
         if (!this.bloomed) {
           this.bloomed = true;
