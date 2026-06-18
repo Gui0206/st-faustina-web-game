@@ -124,6 +124,9 @@ const Engine = {
     const next = SCENES[id];
     if (!next) return;
     const doSwitch = () => {
+      /* a focused DOM button (menu / choice) would re-fire on the next
+         Space/Enter key-release and restart the scene — never carry focus in */
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
       if (this.scene && this.scene.exit) this.scene.exit();
       Particles.clear();
       Tweens.clear();

@@ -1744,6 +1744,10 @@ const Choices = {
       b.addEventListener('click', e => {
         e.stopPropagation();
         if (o.disabled) return;
+        /* drop focus before navigating: a mouse-clicked <button> keeps DOM
+           focus, and the next Space/Enter the player presses to pray/advance
+           would re-fire THIS button on key-release — restarting the chapter. */
+        b.blur();
         this.hide();
         Audio.pluck('A4', 0.3);
         cb(o.id);
@@ -3027,6 +3031,9 @@ const Engine = {
     const next = SCENES[id];
     if (!next) return;
     const doSwitch = () => {
+      /* a focused DOM button (menu / choice) would re-fire on the next
+         Space/Enter key-release and restart the scene — never carry focus in */
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
       if (this.scene && this.scene.exit) this.scene.exit();
       Particles.clear();
       Tweens.clear();

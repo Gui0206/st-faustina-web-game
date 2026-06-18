@@ -152,6 +152,10 @@ const Choices = {
       b.addEventListener('click', e => {
         e.stopPropagation();
         if (o.disabled) return;
+        /* drop focus before navigating: a mouse-clicked <button> keeps DOM
+           focus, and the next Space/Enter the player presses to pray/advance
+           would re-fire THIS button on key-release — restarting the chapter. */
+        b.blur();
         this.hide();
         Audio.pluck('A4', 0.3);
         cb(o.id);

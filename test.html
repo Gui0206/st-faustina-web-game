@@ -1744,6 +1744,10 @@ const Choices = {
       b.addEventListener('click', e => {
         e.stopPropagation();
         if (o.disabled) return;
+        /* drop focus before navigating: a mouse-clicked <button> keeps DOM
+           focus, and the next Space/Enter the player presses to pray/advance
+           would re-fire THIS button on key-release — restarting the chapter. */
+        b.blur();
         this.hide();
         Audio.pluck('A4', 0.3);
         cb(o.id);
@@ -3027,6 +3031,9 @@ const Engine = {
     const next = SCENES[id];
     if (!next) return;
     const doSwitch = () => {
+      /* a focused DOM button (menu / choice) would re-fire on the next
+         Space/Enter key-release and restart the scene — never carry focus in */
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
       if (this.scene && this.scene.exit) this.scene.exit();
       Particles.clear();
       Tweens.clear();
@@ -3231,7 +3238,7 @@ class PrayBloom {
   constructor(opts = {}) {
     this.v = 0;
     this.riseTime = opts.riseTime || 2.6;   // seconds of holding to reach 1
-    this.fall = opts.fall || 0.12;          // per second when released
+    this.fall = opts.fall ?? 0.12;          // per second when released (0 = never drains)
     this.muted = opts.muted || false;       // ch8: the hold that "doesn't answer"
     this.onFull = opts.onFull || null;
     this._wasFull = false;
@@ -3531,7 +3538,12 @@ SCENES.ch1 = {
   enter() {
     this.t = 0;
     this.bloom = new PrayBloom({
-      riseTime: 3.4, fall: 0.1,
+      /* ch1 teaches the verb: holding must only ever build, never punish.
+         fall:0 means letting go pauses the bloom where it is — the player
+         just holds (across as many grips as they like) until the candle
+         fills, the bell sounds, and the next line comes. The bell IS the
+         "you can let go now" cue; releasing after it never undoes anything. */
+      riseTime: 2.4, fall: 0,
       onFull: () => {
         if (!this.bloomed) {
           this.bloomed = true;
