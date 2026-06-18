@@ -21,7 +21,7 @@ class PrayBloom {
   constructor(opts = {}) {
     this.v = 0;
     this.riseTime = opts.riseTime || 2.6;   // seconds of holding to reach 1
-    this.fall = opts.fall || 0.12;          // per second when released
+    this.fall = opts.fall ?? 0.12;          // per second when released (0 = never drains)
     this.muted = opts.muted || false;       // ch8: the hold that "doesn't answer"
     this.onFull = opts.onFull || null;
     this._wasFull = false;
