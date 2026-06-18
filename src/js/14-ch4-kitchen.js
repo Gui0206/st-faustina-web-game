@@ -49,14 +49,28 @@ SCENES.ch4 = {
     Tweens.to(this, { roseBloom: 1 }, 2.6, { ease: Ease.inOutSine });
     Audio.shimmer(0.6, 700);
     Audio.bell('F4', 0.22, 1);
-    for (let i = 0; i < 38; i++) {
-      Engine.after(i * 60, () => {
+    const shades = ['#d8506a', '#c23a55', '#e76d83', '#b83048'];
+    const mouthX = 330, mouthY = 488;
+    for (let i = 0; i < 34; i++) {
+      Engine.after(i * 70, () => {
+        /* roses well up and SPILL over both rims — mirrored, alternating
+           sides (every fifth wells straight up), then arc back down and
+           cascade over the pot's edges rather than jetting vertically */
+        const side = i % 5 === 0 ? 0 : (i % 2 ? 1 : -1);
+        const out = side * rand(60, 160);
         Particles.spawn({
-          x: 330 + rand(-46, 46), y: 520 + rand(-10, 10),
-          vx: rand(-36, 36), vy: rand(-130, -50), ay: 60,
-          life: rand(1.8, 3.4), size: rand(4, 8), endSize: 2,
-          color: pick(['#d8506a', '#c23a55', '#e76d83']), alpha: 0.85,
-          shape: 'petal', spin: rand(-3, 3), wobble: rand(6, 16), fadeIn: 0.15, drag: 0.99,
+          x: mouthX + side * rand(10, 40) + rand(-8, 8), y: mouthY + rand(-8, 8),
+          vx: out, vy: rand(-150, -95), ay: 230,
+          life: rand(2.4, 3.8), size: rand(7, 11), endSize: rand(13, 20),
+          color: pick(shades), alpha: 0.96,
+          shape: 'rose', spin: side * rand(0.5, 1.5) + rand(-0.2, 0.2),
+          wobble: rand(4, 12), fadeIn: 0.28, drag: 0.992,
+        });
+        /* a soft warm light behind each bloom */
+        if (Math.random() < 0.6) Particles.spawn({
+          x: mouthX + out * 0.2, y: mouthY, vx: out * 0.5, vy: rand(-95, -55), ay: 170,
+          life: rand(1.4, 2.4), size: rand(10, 18), endSize: 3,
+          color: '#ff9ab0', alpha: 0.4, additive: true, glow: true, fadeIn: 0.3, drag: 0.99,
         });
       });
     }
@@ -204,20 +218,28 @@ SCENES.ch4 = {
       R.glow(ctx, 296, 512, 40, 'rgba(255,180,110,0.55)');
       ctx.restore();
     }
-    /* roses overflowing at the finale */
+    /* roses overflowing at the finale — a heaped, mirrored mound brimming
+       over the mouth of the pot, opening rose by rose as the bloom rises */
     if (this.roseBloom > 0.01) {
+      const a = this.roseBloom;
+      const roseShades = ['#c93b56', '#e05c75', '#a92f47', '#d84d68'];
+      const spots = [
+        [0, -34], [-22, -30], [22, -30], [-44, -16], [44, -16],
+        [-12, -50], [12, -50], [-66, 0], [66, 0], [0, -16],
+        [-36, -2], [36, -2],
+      ];
       ctx.save();
-      const roseShades = ['#c93b56', '#e05c75', '#a92f47'];
-      for (let i = 0; i < 12; i++) {
-        srand(i * 31 + 7);
-        const a = this.roseBloom;
-        const px = 330 + (rng() - 0.5) * 150 * a, py = 488 - rng() * 40 * a;
-        ctx.globalAlpha = a * (0.7 + rng() * 0.3);
-        ctx.fillStyle = roseShades[(rng() * roseShades.length) | 0];
-        ctx.beginPath(); ctx.arc(px, py, 7 + rng() * 7 * a, 0, TAU); ctx.fill();
-      }
+      spots.forEach(([dx, dy], i) => {
+        srand(i * 17 + 5);
+        const grow = clamp01((a - i * 0.04) / 0.5);   // bloom in sequence
+        if (grow <= 0.02) return;
+        const r = (9 + rng() * 6) * grow;
+        ctx.globalAlpha = grow * (0.85 + rng() * 0.15);
+        R.rose(ctx, 330 + dx * (0.55 + a * 0.45), 488 + dy * a, r, rng() * TAU, roseShades[i % roseShades.length]);
+      });
       ctx.restore();
-      lamp(ctx, 330, 490, 120 * this.roseBloom, 'rgba(255,120,140,0.5)', this.roseBloom * 0.7, t, 0.04);
+      ctx.globalAlpha = 1;
+      lamp(ctx, 330, 484, 130 * a, 'rgba(255,130,150,0.5)', a * 0.7, t, 0.04);
     }
 
     /* ---- station: basket of potatoes ---- */
@@ -252,22 +274,30 @@ SCENES.ch4 = {
     this._fx = fx;
     R.nun(ctx, fx, 800, 270, { color: '#141019' });
 
-    /* station auras (gentle invitations) */
+    /* station auras (gentle invitations) — each unfinished station carries
+       the same legible cue: a warm halo, a bright core that reads even where
+       the window light falls (the potato basket), and a progress ring */
     if (!this.allDone) {
       for (const s of this.stations) {
         if (s.bloom >= 1) continue;
         const pulse = 0.5 + 0.5 * Math.sin(t * 1.6 + s.x);
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
-        ctx.globalAlpha = 0.1 + pulse * 0.1;
-        R.glow(ctx, s.x, s.y, s.r * 0.7, 'rgba(255,226,160,0.5)');
-        ctx.globalAlpha = 0.5 + pulse * 0.3;
-        /* thin progress arc */
-        ctx.strokeStyle = 'rgba(232,201,138,0.6)';
+        ctx.globalAlpha = 0.2 + pulse * 0.18;
+        R.glow(ctx, s.x, s.y, s.r * 0.6, 'rgba(255,214,150,0.6)');
+        ctx.globalAlpha = 0.5 + pulse * 0.4;
+        R.glow(ctx, s.x, s.y, 30, 'rgba(255,236,196,0.9)');
+        ctx.restore();
+        ctx.save();
+        /* faint full track + gold filled progress arc */
+        ctx.globalAlpha = 0.32 + pulse * 0.2;
+        ctx.strokeStyle = 'rgba(255,240,205,0.5)';
         ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, 26, -Math.PI / 2, -Math.PI / 2 + s.bloom * TAU);
-        ctx.stroke();
+        ctx.beginPath(); ctx.arc(s.x, s.y, 26, 0, TAU); ctx.stroke();
+        ctx.globalAlpha = 0.7 + pulse * 0.3;
+        ctx.strokeStyle = 'rgba(240,205,140,0.9)';
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(s.x, s.y, 26, -Math.PI / 2, -Math.PI / 2 + s.bloom * TAU); ctx.stroke();
         ctx.restore();
       }
     }
