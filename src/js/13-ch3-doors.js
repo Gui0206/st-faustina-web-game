@@ -252,7 +252,7 @@ SCENES.ch3 = {
     const kneel = this.kneeling;
     ctx.save();
     if (this.hero.face < 0) { ctx.translate(this.hero.x, 0); ctx.scale(-1, 1); ctx.translate(-this.hero.x, 0); }
-    R.maiden(ctx, this.hero.x, 802, kneel ? 240 : 258, { color: '#241a26', kneel, walk: kneel ? undefined : this.hero.phase });
+    R.maiden(ctx, this.hero.x, 802, kneel ? 185 : 208, { color: '#241a26', kneel, walk: kneel ? undefined : this.hero.phase });
     ctx.restore();
     /* acceptance light */
     if (this.accepted > 0.01) {

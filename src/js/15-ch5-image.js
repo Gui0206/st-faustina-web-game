@@ -234,7 +234,7 @@ SCENES.ch5 = {
     ctx.fillRect(-160, 300, 12, 90);
     ctx.fillRect(-186, 322, 64, 12);
     /* Faustina kneeling, facing the light */
-    R.nun(ctx, -40, 822, 250, { kneel: true, color: '#120e17' });
+    R.nun(ctx, -40, 822, 330, { kneel: true, bow: 0.32, color: '#120e17' });
     /* The Lord */
     R.lumen(ctx, 320, 830, 430, t, { intensity: this.lumenI, rays: this.lumenRays, raise: 1, rayLen: 760 });
     if (this.lumenI > 0.02) {
