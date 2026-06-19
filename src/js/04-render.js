@@ -188,18 +188,21 @@ const R = {
     const bobY = opts.walk !== undefined ? Math.sin(ph * 2) * h * 0.012 : 0;
     const H = h * (1 - kneel * 0.34);
     const sway = opts.walk !== undefined ? Math.sin(ph) * h * 0.02 : 0;
+    /* kneeling: legs fold away and the habit spreads wide on the floor, so the
+       lower bell flares out into a low triangle instead of a short standing column */
+    const kw = 1 + kneel * 0.75;
     ctx.save();
     ctx.translate(x, y + bobY);
     if (opts.flip) ctx.scale(-1, 1);
     ctx.fillStyle = c;
     const headR = H * 0.075;
     const headX = bow * H * 0.13, headY = -H * 0.86 + bow * H * 0.06;
-    /* habit: bell silhouette */
+    /* habit: bell silhouette (skirt pools wide when kneeling) */
     ctx.beginPath();
-    ctx.moveTo(-H * 0.17 + sway * 0.4, 0);
-    ctx.bezierCurveTo(-H * 0.20 + sway, -H * 0.42, -H * 0.115, -H * 0.62, -H * 0.105 + headX * 0.5, -H * 0.76);
+    ctx.moveTo(-H * 0.17 * kw + sway * 0.4, 0);
+    ctx.bezierCurveTo(-H * 0.20 * kw + sway, -H * 0.42, -H * 0.115 * kw, -H * 0.62, -H * 0.105 + headX * 0.5, -H * 0.76);
     ctx.lineTo(H * 0.105 + headX * 0.5, -H * 0.76);
-    ctx.bezierCurveTo(H * 0.115, -H * 0.62, H * 0.20 + sway, -H * 0.42, H * 0.17 + sway * 0.4, 0);
+    ctx.bezierCurveTo(H * 0.115 * kw, -H * 0.62, H * 0.20 * kw + sway, -H * 0.42, H * 0.17 * kw + sway * 0.4, 0);
     ctx.closePath(); ctx.fill();
     /* head */
     ctx.beginPath(); ctx.arc(headX, headY, headR, 0, TAU); ctx.fill();
@@ -211,8 +214,8 @@ const R = {
     ctx.lineTo(headX - headR * 1.2, -H * 0.72);
     ctx.quadraticCurveTo(headX - headR * 1.7, headY + headR * 2.6, headX - headR * 1.15, headY - headR * 0.4);
     ctx.closePath(); ctx.fill();
-    if (kneel) { /* pooled hem */
-      ctx.beginPath(); ctx.ellipse(0, 0, H * 0.26, H * 0.05, 0, 0, TAU); ctx.fill();
+    if (kneel) { /* skirt pooled wide on the floor */
+      ctx.beginPath(); ctx.ellipse(0, 0, H * 0.30 * kw, H * 0.07, 0, 0, TAU); ctx.fill();
     }
     /* pale band of the coif framing the face (tiny accent of light) */
     ctx.fillStyle = opts.coif || 'rgba(228,220,205,0.85)';
